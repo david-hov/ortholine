@@ -1,0 +1,57 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {
+        "no-unused-expression": true
+    },
+    "rules": {
+        "quotemark": [
+            true,
+            "single"
+        ],
+        "react-hooks/rules-of-hooks": "error",
+        "no-shadowed-variable": false,
+        "react-hooks/exhaustive-deps": "off",
+        "triple-equals": false,
+        "no-mixed-operators": 0,
+        "no-unused-declaration": true,
+        "no-consecutive-blank-lines": true,
+        "array-type": false,
+        "variable-name": [
+            false,
+            "allow-leading-underscore"
+        ],
+        "no-string-literal": [
+            false
+        ],
+        "no-var-requires": [
+            false
+        ],
+        "member-access": [
+            false
+        ],
+        "object-literal-shorthand": false,
+        "ordered-imports": [
+            false
+        ],
+        "max-line-length": [
+            false,
+            150
+        ],
+        "member-ordering": [
+            false
+        ],
+        "interface-name": [
+            false
+        ],
+        "no-unused-expression": false,
+        "no-console": false,
+        "arrow-parens": false,
+        "object-literal-sort-keys": false,
+        "radix": false,
+        "object-literal-key-quotes": [false]
+    },
+    "rulesDirectory": []
+}

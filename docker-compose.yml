@@ -1,0 +1,72 @@
+version: "3"
+services:
+  # postgres_db:
+  #   container_name: postgres_db
+  #   image: postgres:14.2-alpine
+  #   restart: always
+  #   ports:
+  #     - 5438:5432
+  #   environment:
+  #     - TZ=GMT+4
+  #     - POSTGRES_USER=admin
+  #     - POSTGRES_PASSWORD=admin
+  #     - POSTGRES_DB=Ortholine
+  #     - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+  #     - PGADMIN_DEFAULT_PASSWORD=admin
+  #   volumes:
+  #     - db:/var/lib/postgresql/data
+
+  pgbackups:
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    volumes:
+      - backups:/var/lib/pgbackups/data
+    # links:
+    #   - postgres_db
+    # depends_on:
+    #   - postgres_db
+    environment:
+      - TZ=GMT+4
+      - POSTGRES_HOST=192.168.31.215
+      - POSTGRES_PORT=5438
+      - POSTGRES_DB=Ortholine
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_EXTRA_OPTS=-Z6 --schema=public --blobs
+      - SCHEDULE=0 */7 * * *
+      - BACKUP_KEEP_DAYS=7
+      - BACKUP_KEEP_WEEKS=4
+      - BACKUP_KEEP_MONTHS=6
+      - HEALTHCHECK_PORT=8080
+
+  api:
+    image: test-api:latest
+    container_name: test-api
+    restart: always
+    # links:
+    #   - postgres_db
+    # depends_on:
+    #   - postgres_db
+    environment:
+      - JWT_SECRET=asdasdfdgdsfgthsdfdsf
+      - ENV=dev
+      - ATTACHMENTS_PATH=/app/attachments
+      - DATABASE_TYPE=postgres
+      - DATABASE_HOST=192.168.31.215
+      - DATABASE_PORT=5438
+      - DATABASE_NAME=Ortholine
+      - DATABASE_USERNAME=admin
+      - DATABASE_PASSWORD=admin
+      - CompanyName=Ortholine
+      - GOOGLE_CLIENT_ID=217029788170-p0jr6aonob8b97r2a4gpd85uvmahogor.apps.googleusercontent.com
+      - GOOGLE_SECRET=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
+    ports:
+      - 3001:3001
+      - 4001:4001
+    volumes:
+      - api-attachments:/app/attachments
+
+volumes:
+  # db:
+  api-attachments:
+  backups:

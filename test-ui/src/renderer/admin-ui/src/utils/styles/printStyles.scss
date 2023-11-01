@@ -1,0 +1,126 @@
+.print-body {
+    padding: 30px 30px;
+
+    .report-per-fee {
+        border-bottom: 1px solid;
+        margin       : 0;
+    }
+
+    .price-empty-row {
+        border-top: 1px solid;
+        border-left: 1px solid;
+    }
+
+    .report-per-fee:last-child {
+        border-bottom: unset;
+    }
+
+    .isDeleted {
+        background-color: #ff000070 !important;
+    }
+
+    .header {
+        display        : flex;
+        justify-content: space-between;
+
+        img {
+            object-fit: contain;
+            width     : 240px !important;
+            height    : auto !important;
+        }
+
+        p {
+            margin    : 5px 0;
+            text-align: right;
+        }
+    }
+
+    table {
+        margin-top    : 5px;
+        width         : 100%;
+        border-spacing: 0;
+
+        .bold {
+            font-weight: bolder;
+        }
+
+        .footer {
+            background-color: yellow;
+        }
+
+        thead {
+            background-color: orange;
+        }
+
+        tbody {
+            tr:nth-child(odd) {
+                background-color: #e3e3e3;
+                color           : black;
+            }
+        }
+
+        .empty-col {
+            border-left: 1px solid;
+            border-top : 1px solid;
+        }
+
+        .treatment {
+            border-top  : 1px solid;
+            border-right: 1px solid;
+        }
+
+        .price {
+            border: 1px solid;
+        }
+
+        .price-row {
+            text-align : center;
+            font-weight: bolder;
+        }
+
+        .empty-row {
+            width      : 30px;
+            text-align : center;
+            border-left: 1px solid;
+            border-top : 1px solid
+        }
+
+        .empty-row,
+        .price-row,
+        .treatment-row {
+            border-right: 1px solid;
+        }
+
+        .treatment-row,
+        .price-row {
+            border-top: 1px solid;
+        }
+
+        .first-treatment {
+            border-top: 1px solid;
+        }
+
+        .footer {
+            .row {
+                border-bottom: 1px solid;
+                border-right : 1px solid;
+                border-top   : 1px solid;
+                text-align   : center;
+                font-weight  : bolder;
+            }
+
+            .first-row {
+                border-left  : 1px solid;
+                border-right : unset;
+                border-top   : 1px solid;
+                border-bottom: 1px solid;
+            }
+        }
+
+        .add-text {
+            td {
+                padding-bottom: 10px;
+            }
+        }
+    }
+}
