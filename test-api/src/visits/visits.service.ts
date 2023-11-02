@@ -181,6 +181,10 @@ export class VisitsService {
             .where(qb => {
                 qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                 qb.andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
+                if (parsedFilter.hasOwnProperty('startDate') && parsedFilter.hasOwnProperty('endDate')) {
+                    qb.andWhere(`visits.startDate >= :date`, { date: moment(parsedFilter.startDate).format("YYYY-MM-DD HH:mm:ss") })
+                    qb.andWhere(`visits.endDate <= :dateEnd`, { dateEnd: moment(parsedFilter.endDate).format("YYYY-MM-DD 23:59:ss") })
+                }
                 if (roleData && roleData.name === 'doctor') {
                     qb.andWhere('doctors.id = :doctorId', { doctorId: roleData.user[0].doctors.id })
                 }
@@ -199,19 +203,11 @@ export class VisitsService {
                     } else {
                         qb.andWhere(`treatments.discountForTreatment = :discountForTreatment`, { discountForTreatment: 0 })
                     }
-                    // qb.andWhere(`visits.treatment::jsonb @@ '$.text like_regex "${parsedFilter.name.trim()}"'`)
                 }
                 if (parsedFilter.hasOwnProperty('treatmentWord')) {
                     qb.andWhere(`treatments.treatmentName ILIKE :treatmentWord`, { treatmentWord: `%${parsedFilter.treatmentWord.trim()}%` })
-                    // qb.andWhere(`visits.treatment::jsonb @@ '$.text like_regex "${parsedFilter.name.trim()}"'`)
-                }
-                if (parsedFilter.hasOwnProperty('startDate') && parsedFilter.hasOwnProperty('endDate')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
-                    qb.andWhere(`visits.startDate >= :date`, { date: moment(parsedFilter.startDate).format("YYYY-MM-DD HH:mm:ss") })
-                    qb.andWhere(`visits.endDate <= :dateEnd`, { dateEnd: moment(parsedFilter.endDate).format("YYYY-MM-DD 23:59:ss") })
                 }
                 if (parsedFilter.hasOwnProperty('balance')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                     if (parsedFilter['balance'] == false) {
                         qb.andWhere('visits.balance = :balance OR visits.balance ISNULL', { balance: 0 })
                     } else {
@@ -222,19 +218,15 @@ export class VisitsService {
                     qb.andWhere(`doctors.id = :id`, { id: parsedFilter['doctors'] })
                 }
                 if (parsedFilter.hasOwnProperty('lastVisitChecked')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                     qb.andWhere(`visits.lastVisitChecked = :lastVisitChecked`, { lastVisitChecked: VisitStatus[parsedFilter.lastVisitChecked] })
                 }
                 if (parsedFilter.hasOwnProperty('treatmentsFilled')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                     qb.andWhere(`visits.treatmentsFilled = :treatmentsFilled`, { treatmentsFilled: parsedFilter.treatmentsFilled })
                 }
                 if (parsedFilter.hasOwnProperty('insurance')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                     qb.andWhere(`visits.insurance = :insurance`, { insurance: parsedFilter.insurance })
                 }
                 if (parsedFilter.hasOwnProperty('xRayCount')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                     if (parsedFilter['xRayCount'] == false) {
                         qb.andWhere('visits.xRayCount = :xRayCount OR visits.xRayCount ISNULL', { xRayCount: 0 })
                     } else {
@@ -245,11 +237,9 @@ export class VisitsService {
                     qb.andWhere('feeHistory.isCash = :isCash', { isCash: parsedFilter.isCash })
                 }
                 if (parsedFilter.hasOwnProperty('feeSentToDoctor')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                     qb.andWhere('feeHistory.feeSentToDoctor = :feeSentToDoctor', { feeSentToDoctor: parsedFilter.feeSentToDoctor })
                 }
                 if (parsedFilter.hasOwnProperty('feeSentToSalary')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                     qb.andWhere('feeHistory.feeSentToSalary = :feeSentToSalary', { feeSentToSalary: parsedFilter.feeSentToSalary })
                 }
                 if (parsedFilter.hasOwnProperty('closedInsuranceStatus')) {
@@ -257,7 +247,6 @@ export class VisitsService {
                     qb.andWhere('treatments.closedInsuranceStatus = :closedInsuranceStatus', { closedInsuranceStatus: parsedFilter.closedInsuranceStatus })
                 }
                 if (parsedFilter.hasOwnProperty('closedInsuranceXrayStatus')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                     qb.andWhere('visits.closeXRayCountInsurance = :closeXRayCountInsurance', { closeXRayCountInsurance: parsedFilter.closedInsuranceXrayStatus })
                 }
                 if (parsedFilter.hasOwnProperty('insuranceSalarySentToDoctor')) {
@@ -281,8 +270,6 @@ export class VisitsService {
                     }
                 }
                 if (parsedFilter.hasOwnProperty('notifyAdminAboutPrice')) {
-                    qb.andWhere('insurance IS NULL')
-                    // qb.andWhere('visits.isDeleted = :isDeleted', { isDeleted: false })
                     if (parsedFilter['notifyAdminAboutPrice'] == false) {
                         qb.andWhere('visits.notifyAdminAboutPrice = :notifyAdminAboutPrice', { notifyAdminAboutPrice: false })
                     } else {
@@ -290,7 +277,6 @@ export class VisitsService {
                     }
                 }
                 if (parsedFilter.hasOwnProperty('callClient')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                     if (parsedFilter['callClient'] == false) {
                         qb.andWhere('visits.callClient = :callClient OR visits.callClient ISNULL', { callClient: false })
                     } else {
@@ -298,7 +284,6 @@ export class VisitsService {
                     }
                 }
                 if (parsedFilter.hasOwnProperty('callLab')) {
-                    // qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
                     if (parsedFilter['callLab'] == false) {
                         qb.andWhere('visits.callLab = :callLab OR visits.callLab ISNULL', { callLab: false })
                     } else {

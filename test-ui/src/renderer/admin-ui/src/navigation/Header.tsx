@@ -325,7 +325,7 @@ const Header = () => {
                                                             left: '2px',
                                                             bottom: '3px',
                                                             fontSize: '15px'
-                                                        }} className='notify-icon-counter'>{clientsReminder.length}</span>
+                                                        }} className='notify-icon-counter'>{clientsReminder.length >= 99 ? `99` : clientsReminder.length}</span>
                                                         <div style={{
                                                             position: 'absolute',
                                                             left: '-2px',
@@ -339,13 +339,15 @@ const Header = () => {
                                                 {waitingClients.length !== 0 ?
                                                     <div title='Պացիենտը ունի այց և սպասում է շտապ այցի'>
                                                         <span style={{
-                                                            top: '1px',
-                                                            left: waitingClients.length > 9 ? '0' : '5px',
-                                                        }} className='notify-icon-counter'>{waitingClients.length}</span>
+                                                            top: '0px',
+                                                            left: '5px',
+                                                            width: '35px',
+                                                            textAlign: 'right',
+                                                        }} className='notify-icon-counter'>{waitingClients.length >= 99 ? `99` : waitingClients.length}</span>
                                                         <div style={{
                                                             position: 'absolute',
-                                                            left: waitingClients.length > 9 ? '19px' : '15px',
-                                                            top: '5px',
+                                                            left: '38px',
+                                                            top: '0',
                                                         }}>
                                                             <WaitingIcon className='alertIcon' />
                                                         </div>
@@ -353,13 +355,15 @@ const Header = () => {
                                                 {notFinishedClients.length !== 0 ?
                                                     <div title='Պացիենտը չունի հետագա այց'>
                                                         <span style={{
-                                                            top: '1px',
-                                                            right: notFinishedClients.length > 9 ? '9px' : '5px',
-                                                        }} className='notify-icon-counter'>{notFinishedClients.length}</span>
+                                                            top: '0',
+                                                            right: '12px',
+                                                            width: '25px',
+                                                            textAlign: 'left',
+                                                        }} className='notify-icon-counter'>{notFinishedClients.length >= 99 ? `99` : notFinishedClients.length}</span>
                                                         <div style={{
                                                             position: 'absolute',
-                                                            right: notFinishedClients.length > 9 ? '25px' : '15px',
-                                                            top: '5px',
+                                                            right: '35px',
+                                                            top: '0',
                                                         }}>
                                                             <LateIcon className='alertIcon' />
                                                         </div></div> : null
@@ -378,13 +382,15 @@ const Header = () => {
                                                 {priceIssues.length !== 0 ?
                                                     <div title='Առկա է անհամապատասխանություն արժեքների մեջ'>
                                                         <span style={{
-                                                            top: '1px',
-                                                            left: priceIssues.length > 9 ? '0' : '5px',
-                                                        }} className='notify-icon-counter'>{priceIssues.length}</span>
+                                                            top: '0',
+                                                            left: '0',
+                                                            width: '25px',
+                                                            textAlign: 'right',
+                                                        }} className='notify-icon-counter'>{priceIssues.length >= 99 ? `99` : priceIssues.length}</span>
                                                         <div style={{
                                                             position: 'absolute',
-                                                            left: priceIssues.length > 9 ? '18px' : '15px',
-                                                            top: '5px',
+                                                            left: '23px',
+                                                            top: '0',
                                                         }}>
                                                             <PriceIssueIcon className='alertIcon' />
                                                         </div>
@@ -395,8 +401,8 @@ const Header = () => {
                                                     <div title='Զանգ պացիենտին, հարցման համար'>
                                                         <span style={{
                                                             position: 'absolute',
-                                                            left: '2px',
-                                                            bottom: '3px',
+                                                            left: '-1px',
+                                                            bottom: '1px',
                                                             fontSize: '15px'
                                                         }} className='notify-icon-counter'>{callClients.length}</span>
                                                         <div style={{
@@ -430,13 +436,15 @@ const Header = () => {
                                                 {notFinishedVisits.length !== 0 ?
                                                     <div title='Բժիշկը չի լրացրել կատարված աշխատանքը'>
                                                         <span style={{
-                                                            top: '1px',
-                                                            right: notFinishedVisits.length > 9 ? '0' : '5px',
-                                                        }} className='notify-icon-counter'>{notFinishedVisits.length}</span>
+                                                            top: '0',
+                                                            right: '0',
+                                                            width: '25px',
+                                                            textAlign: 'left',
+                                                        }} className='notify-icon-counter'>{notFinishedVisits.length >= 99 ? `99` : notFinishedVisits.length}</span>
                                                         <div style={{
                                                             position: 'absolute',
-                                                            right: '15px',
-                                                            top: '5px',
+                                                            right: '20px',
+                                                            top: '0',
                                                         }}>
                                                             <NotFinishedVisitsIcon className='alertIcon' />
                                                         </div>

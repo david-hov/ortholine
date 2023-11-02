@@ -122,7 +122,7 @@ export class AuthService {
             doctors: doctors,
             password: hashedPassword,
             roles,
-            googleToken: '1//09rQxIOBD0kCcCgYIARAAGAkSNwF-L9IrvzvgL70j0IR9hC_Ev4nNRU44vCypd7Iv92YLNyDUVNwhkCRuA-Ai1UK5LcLUyaFTxY8'
+            googleToken: process.env.GOOGLE_CALENDAR_TOKEN
         });
     }
 

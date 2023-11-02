@@ -80,7 +80,7 @@ export class VisitsGoogleCalendarService {
             // @ts-ignore
             const response: any = await this.calendar.events.patch({
                 auth: auth,
-                calendarId: 'primary',
+                calendarId: body.doctors.calendarId ? body.doctors.calendarId : 'primary',
                 eventId: body.googleCalendarEventId,
                 resource: event
             });
