@@ -48,19 +48,19 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
 
     useEffect(() => {
         const imageData = localStorage.getItem('image');
-        if (permissions == 'doctor') {
-            const doctorToken = localStorage.getItem('token');
-            if (doctorToken) {
-                const decodedToken: any = jwt_decode(doctorToken);
-                dataProvider.getOne('users', {
-                    id: decodedToken.sub
-                }).then(({ data }: any) => {
-                    if (data.doctors) {
-                        setDoctorId(data.doctors);
-                    }
-                })
-            }
-        }
+        // if (permissions == 'doctor') {
+        //     const doctorToken = localStorage.getItem('token');
+        //     if (doctorToken) {
+        //         const decodedToken: any = jwt_decode(doctorToken);
+        //         dataProvider.getOne('users', {
+        //             id: decodedToken.sub
+        //         }).then(({ data }: any) => {
+        //             if (data.doctors) {
+        //                 setDoctorId(data.doctors);
+        //             }
+        //         })
+        //     }
+        // }
         if (imageData != 'null') {
             setImage(imageData);
         }
@@ -77,16 +77,18 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
         refresh();
     };
 
-    const change = async (doctorId: any, startDate: any) => {
-        const { data } = await dataProvider.getList('doctors/available', {
-            pagination: { page: 1, perPage: 2 },
-            sort: { field: 'id', order: 'DESC' },
-            filter: { id: doctorId, startDate: startDate }
-        })
-        if (data) {
-            setModal(true);
-        } else {
-            setModal(false);
+    const change = async (event: any, startDate: any) => {
+        if (event && (startDate !== null || startDate !== '')) {
+            const { data } = await dataProvider.getList('doctors/available', {
+                pagination: { page: 1, perPage: 2 },
+                sort: { field: 'id', order: 'DESC' },
+                filter: { id: event.target.value, startDate: startDate }
+            })
+            if (data) {
+                setModal(true);
+            } else {
+                setModal(false);
+            }
         }
     }
 
@@ -136,7 +138,7 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
                         </CustomModal>
                     }
                     <div style={{ flex: '1' }}>
-                        {doctorId !== null ?
+                        {/* {doctorId !== null ?
                             <ReferenceInput fullWidth label="Բժիշկ" source="doctors" reference="doctors">
                                 <SelectInput style={{ display: 'none' }} defaultValue={doctorId} value={doctorId} fullWidth label="Բժիշկ" optionText="name" />
                             </ReferenceInput> :
@@ -147,15 +149,16 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
                                     </ReferenceInput>
                                 }
                             </FormDataConsumer>
-                        }
-                        {id || location.state.clientId ?
-                            <ReferenceInput source="clients" reference="clients">
-                                <SelectInput style={{ display: 'none' }} defaultValue={id || location.state.clientId} value={id || location.state.clientId} />
-                            </ReferenceInput> :
-                            <ReferenceInput source="clients" reference="clients">
+                        } */}
+                        <FormDataConsumer>
+                                {({ formData }: any) =>
+                        <ReferenceInput fullWidth label="Բժիշկ" source="doctors" reference="doctors">
+                            <SelectInput onChange={(e: any) => change(e, formData.startDate)} validate={required('Պարտադիր դաշտ')} fullWidth label="Բժիշկ" optionText="name" />
+                        </ReferenceInput>}
+                            </FormDataConsumer>
+                        <ReferenceInput source="clients" reference="clients">
                                 <AutocompleteInput noOptionsText={<Button variant='contained' onClick={() => createClient(true)}>Ավելացնել ցանկում</Button>} validate={required('Պարտադիր դաշտ')} fullWidth label="Պացիենտ" optionText={optionRenderer} />
                             </ReferenceInput>
-                        }
                         <FormDataConsumer>
                             {({ formData }: any) =>
                                 <>
@@ -170,11 +173,11 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
                         <TextInput source='info' fullWidth label='Նշումներ' />
                     </div>
                     <div style={{ display: 'flex', flex: '1', justifyContent: 'center', alignItems: 'center' }}>
-                        <div style={{ padding: '20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
                             <img style={{
                                 objectFit: 'contain',
-                                width: '100%',
-                                height: '100%',
+                                width: '50%',
+                                height: '50%',
                             }} src={image ? image : Logo} />
                         </div>
                     </div>

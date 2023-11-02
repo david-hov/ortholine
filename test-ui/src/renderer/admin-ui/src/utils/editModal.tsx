@@ -25,7 +25,7 @@ export const EditModal = ({ resource, id, validate, onSuccess, handleClose, chil
 
     const PostEditToolbar = () => {
         const record = useRecordContext();
-        const existSentSalary = record.feeHistory && record.feeHistory.findIndex((el: any) => el.feeSentToDoctor);
+        // const existSentSalary = record.feeHistory && record.feeHistory.findIndex((el: any) => el.feeSentToDoctor);
         return (
             <Toolbar>
                 {(permissions == 'doctor' && record.disabled) ? <></> :

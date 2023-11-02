@@ -23,8 +23,10 @@ import {
     TextInput,
     FunctionField,
     BulkDeleteWithConfirmButton,
+    SelectField,
+    useRefresh,
 } from 'react-admin';
-import { Box, Card, CardContent, Typography, useMediaQuery } from '@mui/material';
+import { Box, Card, CardContent, Menu, MenuItem, Typography, useMediaQuery } from '@mui/material';
 import { matchPath, useLocation } from 'react-router-dom';
 import moment from 'moment';
 
@@ -33,8 +35,24 @@ import { VisitsEdit } from './VisitsEdit';
 import { CustomDateInput } from '../utils/dateInput';
 import { useSocket } from '../utils/socketHook';
 import { useNavigate } from 'react-router';
+import { dataProvider } from '../dataProvider';
 
 const LoadedGridList = ({ permissions }: any) => {
+    const refresh = useRefresh();
+    const [contextMenu, setContextMenu] = useState<any>(null);
+
+    const handleClick = (event: any, id: any) => {
+        setContextMenu(
+            contextMenu === null
+                ? {
+                    mouseX: event.clientX - 2,
+                    mouseY: event.clientY - 4,
+                    id: id
+                }
+                : null,
+        );
+    };
+
     const PostBulkActionButtons = (props: any) => {
         return <BulkDeleteWithConfirmButton
             confirmTitle='Զգուշացում'
@@ -43,25 +61,69 @@ const LoadedGridList = ({ permissions }: any) => {
             confirmContent='Եթե առկա լինի բժշկին ՓՈԽԱՆՑՎԱԾ գումար,
             ջնջելու դեպքում գումարը մնալու է բժշկի հաշվին:'
         />
-    };
-    return <Datagrid bulkActionButtons={permissions != 'doctor' ? <PostBulkActionButtons /> : false} empty={<p>Այցելություն գրանցված չէ</p>}>
-        <ReferenceField emptyText='-' label="Անուն" source="clients" reference="clients">
-            <TextField source="name" />
-        </ReferenceField>
-        <ReferenceField emptyText='-' label="Ապահովագրություն" source="insurance" reference="insurance">
-            <TextField source='name' />
-        </ReferenceField>
-        <DateField locales="fr-FR" showTime source='startDate' label='Այց․ տարեթիվ' />
-        <ReferenceField link={permissions !== 'doctor' ? (record: any, reference: any) => `/${reference}/${record.id}` : false} emptyText='-' label="Բժիշկ" source="doctors" reference="doctors">
-            <TextField source='name' />
-        </ReferenceField>
-        <FunctionField
-            render={(record: any) => record && <EditButton className={record.lastVisitChecked == 'came' && record.treatments.length == 0 ? 'button-error' : ''} variant='contained' />}
-        />
-    </Datagrid>
+    }
+
+    const sendArrived = async (arrivedStatus: string) => {
+        await dataProvider.update('visits/isArrived', {
+            id: contextMenu.id,
+            data: {
+                lastVisitChecked: arrivedStatus
+            },
+            previousData: {}
+        });
+        setContextMenu(null);
+        refresh();
+    }
+
+    return <>
+        <Menu
+            className="right-click-menu"
+            anchorReference="anchorPosition"
+            anchorPosition={
+                contextMenu !== null
+                    ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+                    : undefined
+            }
+            keepMounted
+            open={contextMenu !== null}
+            onClose={() => setContextMenu(null)}
+        >
+            <MenuItem onClick={() => sendArrived('came')}>
+                Մոտեցել է
+            </MenuItem>
+            <MenuItem onClick={() => sendArrived('notCame')}>
+                Չի մոտեցել
+            </MenuItem>
+        </Menu>
+        <Datagrid bulkActionButtons={permissions != 'doctor' ? <PostBulkActionButtons /> : false} empty={<p>Այցելություն գրանցված չէ</p>}>
+            <ReferenceField emptyText='-' label="Անուն" source="clients" reference="clients">
+                <TextField source="name" />
+            </ReferenceField>
+            <ReferenceField emptyText='-' label="Ապահովագրություն" source="insurance" reference="insurance">
+                <TextField source='name' />
+            </ReferenceField>
+            <DateField locales="fr-FR" showTime source='startDate' label='Այց․ տարեթիվ' />
+            <ReferenceField link={permissions !== 'doctor' ? (record: any, reference: any) => `/${reference}/${record.id}` : false} emptyText='-' label="Բժիշկ" source="doctors" reference="doctors">
+                <TextField source='name' />
+            </ReferenceField>
+            <FunctionField
+                source='lastVisitChecked'
+                label='Կարգ.'
+                render={(record: any) => record &&
+                <SelectField style={{cursor: 'pointer'}} choices={[
+                    { id: 'notCame', name: 'Չի մոտեցել' },
+                    { id: 'came', name: 'Մոտեցել է' },
+                    { id: 'late', name: 'Ուշացում' },
+                ]} source='lastVisitChecked' onContextMenu={(e) => permissions != 'doctor' && handleClick(e, record.id)} />
+            }/>
+            <FunctionField
+                render={(record: any) => record && <EditButton className={record.lastVisitChecked == 'came' && record.treatments.length == 0 ? 'button-error' : ''} variant='contained' />}
+            />
+        </Datagrid>
+    </>
 }
 
-const VisitsActions = ({permissions} : any) => {
+const VisitsActions = ({ permissions }: any) => {
     return (
         <TopToolbar>
             <FilterButton />
@@ -80,7 +142,7 @@ const VisitsActions = ({permissions} : any) => {
     );
 };
 
-const Empty = ({permissions} : any) => (
+const Empty = ({ permissions }: any) => (
     <Box textAlign='center'>
         <Typography variant='h4' paragraph>
             Ցանկը դատարկ է
@@ -212,6 +274,9 @@ export const VisitsList = () => {
         <NullableBooleanInput label='Կատարված աշխատանքները լրացված են/լրացված չեն' source='treatmentsFilled' />,
         <NullableBooleanInput label='Զանգ պացիենտին' source='callClient' />,
         <NullableBooleanInput label='Զանգ լաբ․' source='callLab' />,
+        <ReferenceInput label="Այցեր ապահովագրությամբ" source="insurance" reference="insurance" >
+            <SelectInput label="Ապպա" optionText='name' />
+        </ReferenceInput>,
     ];
 
     if (isLoading) return <Loading />
@@ -233,13 +298,13 @@ export const VisitsList = () => {
                 <>
                     <List
                         pagination={<PostPagination />}
-                        actions={<VisitsActions permissions={permissions}/>}
+                        actions={<VisitsActions permissions={permissions} />}
                         exporter={false}
                         disableSyncWithLocation={true}
                         filter={clientId ? { clients: `${clientId}` } : undefined}
                         filters={permissions == 'doctor' ? doctorFilters : postFilters}
                         perPage={25}
-                        empty={<Empty permissions={permissions}/>}
+                        empty={<Empty permissions={permissions} />}
                         component='div'
                         sort={{ field: 'id', order: 'DESC' }}
                     >

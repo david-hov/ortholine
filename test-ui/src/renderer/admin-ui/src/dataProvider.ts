@@ -7,11 +7,7 @@ import moment from 'moment';
 
 // @ts-ignore
 // const apiUrl = process.env.NODE_ENV !== 'development' ? envConfig['REACT_APP_ADMIN_API'] : process.env.REACT_APP_ADMIN_API;
-
-const getServerIp = () => {
-    const apiUrl = localStorage.getItem('engine-ip');
-    return apiUrl;
-};
+const apiUrl = localStorage.getItem('engine-ip') || process.env.REACT_APP_ADMIN_API;
 
 const getToken = () => {
     const JWTToken = localStorage.getItem('token');
@@ -28,7 +24,7 @@ export const dataProvider: DataProvider = {
         const { page, perPage } = params.pagination;
         const { field, order } = params.sort;
         const query = `filter=${encodeURIComponent(JSON.stringify(params.filter))}&limit=${perPage}&page=${page}&orderBy=${field}&orderDir=${order}`;
-        const url = `${getServerIp()}/${resource}?${query}`;
+        const url = `${apiUrl}/${resource}?${query}`;
         return Axios.get(url, getToken()).then((res) => ({
             data: res.data.data,
             total: parseInt(res.data.count),
@@ -36,7 +32,7 @@ export const dataProvider: DataProvider = {
     },
 
     getOne: (resource: string, params: any) => {
-        return Axios.get(`${getServerIp()}/${resource}/${params.id}`, getToken()).then((res: any) => {
+        return Axios.get(`${apiUrl}/${resource}/${params.id}`, getToken()).then((res: any) => {
             return ({
                 data: res.data,
             })
@@ -52,23 +48,16 @@ export const dataProvider: DataProvider = {
         if (hasObjectIndex > -1) {
             params.ids.splice(hasObjectIndex, 1)
         }
-        const notReadyToGet = params.ids.find((el: any) => el.hasOwnProperty('id'));
-        if (notReadyToGet) {
-            return Promise.resolve({
-                data: []
-            });
-        } else {
-            const query = `filter=${encodeURIComponent(JSON.stringify(params))}&limit=25&page=1&orderBy=visitDate&orderDir=ASC`;
-            const url = `${getServerIp()}/${resource}?${query}`;
-            return Axios.get(url, getToken()).then(({ data }: any) => ({
-                data: data ? data.data : [],
-                prices: data && data.prices ? data.prices : null
-            }));
-        }
+        const query = `filter=${encodeURIComponent(JSON.stringify(params))}&limit=25&page=1&orderBy=id&orderDir=DESC`;
+        const url = `${apiUrl}/${resource}?${query}`;
+        return Axios.get(url, getToken()).then(({ data }: any) => ({
+            data: data ? data.data : [],
+            prices: data && data.prices ? data.prices : null
+        }));
     },
 
     getManyReference: (resource: string) => {
-        const url = `${getServerIp()}/${resource}`;
+        const url = `${apiUrl}/${resource}`;
         return Axios.get(url, { headers: getToken().headers }).then(({ headers, json }: any) => ({
             data: json,
             total: parseInt(headers.get('content-range').split('/').pop(), 10),
@@ -141,7 +130,7 @@ export const dataProvider: DataProvider = {
                 }
             }
         }
-        return Axios.put(`${getServerIp()}/${resource}/${params.id}`, body, getToken()).then(({ data }: any) => {
+        return Axios.put(`${apiUrl}/${resource}/${params.id}`, body, getToken()).then(({ data }: any) => {
             return ({
                 data: { id: data.id, ...data },
             })
@@ -153,7 +142,7 @@ export const dataProvider: DataProvider = {
     },
 
     updateMany: (resource: string, params: any) => {
-        return Axios.put(`${getServerIp()}/${resource}`, params, getToken()).then(({ data }: any) => {
+        return Axios.put(`${apiUrl}/${resource}`, params, getToken()).then(({ data }: any) => {
             return ({ data: data.json })
         }).catch((err: any) => {
             return Promise.reject(
@@ -173,7 +162,7 @@ export const dataProvider: DataProvider = {
         } else if (body.attachment === undefined) {
             delete body.attachment
         }
-        return Axios.post(`${getServerIp()}/${resource}`, body, getToken()).then(({ data }: any) => {
+        return Axios.post(`${apiUrl}/${resource}`, body, getToken()).then(({ data }: any) => {
             return ({
                 data: data.response.data,
             })
@@ -190,7 +179,7 @@ export const dataProvider: DataProvider = {
     },
 
     delete: (resource: string, params: any) => {
-        return Axios.delete(`${getServerIp()}/${resource}/${params.id}`, getToken()).then(() => ({ data: params.previousData })).catch((err: any) => {
+        return Axios.delete(`${apiUrl}/${resource}/${params.id}`, getToken()).then(() => ({ data: params.previousData })).catch((err: any) => {
             return Promise.reject(
                 err.response.data.message
             );
@@ -202,7 +191,7 @@ export const dataProvider: DataProvider = {
             ids: params.ids,
         };
         const token = getToken().headers;
-        return Axios.delete(`${getServerIp()}/${resource}`, {
+        return Axios.delete(`${apiUrl}/${resource}`, {
             headers: token,
             data: {
                 ids: deletedIds.ids,

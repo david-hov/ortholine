@@ -456,7 +456,7 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                         }
                     </TabPanel>
                     <TabPanel value={value} index={1} className='not-grid'>
-                        <ReferenceArrayField filter={{isDeleted: false}} pagination={<Pagination />} perPage={10} label='Visits' reference='visits' source='visits'>
+                        <ReferenceArrayField filter={{isDeleted: false, lastVisitChecked: 'came'}} pagination={<Pagination />} perPage={10} label='Visits' reference='visits' source='visits'>
                             <Datagrid className='clients-visits-table' bulkActionButtons={<PostBulkActionButtons />} optimized>
                                 <FunctionField
                                     source='treatments'

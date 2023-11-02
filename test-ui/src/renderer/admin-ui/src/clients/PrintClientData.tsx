@@ -62,7 +62,7 @@ export const ComponentToPrint = forwardRef((props: any, ref: any) => {
                         <th className="empty-col"></th>
                         <th className="treatment">Կատարված աշխատանքներ</th>
                         <th className="treatment">ԱՊՊԱ</th>
-                        <th className="price">Արժեքներ (Դր․)</th>
+                        <th className="">Արժեքներ (Դր․)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -83,6 +83,7 @@ export const ComponentToPrint = forwardRef((props: any, ref: any) => {
                         <td className="price-empty-row"></td>
                         <td className="treatment-row bold first-treatment">Ռենտգեններ`</td>
                         <td contentEditable='true' className="price-row first-treatment">{props.printDetails.data.prices['Ռենտգեններ'].includes('null') ? '-' : props.printDetails.data.prices['Ռենտգեններ']}</td>
+                        <td className="empty-last"></td>
                     </tr>
                     <tr>
                         <td className="price-empty-row"></td>

@@ -15,6 +15,22 @@
         border-bottom: unset;
     }
 
+    .empty-last {
+        background-color: white;
+        border-top: 1px solid;
+    }
+
+    tr:last-child {
+        td {
+            border-bottom: 1px solid;
+        }
+
+        th {
+            border-top: 1px solid;
+            border-right: 1px solid;
+        }
+    }
+
     .isDeleted {
         background-color: #ff000070 !important;
     }
@@ -26,7 +42,7 @@
         img {
             object-fit: contain;
             width     : 240px !important;
-            height    : auto !important;
+            height    : 240px !important;
         }
 
         p {

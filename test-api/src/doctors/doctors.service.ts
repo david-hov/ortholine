@@ -149,11 +149,14 @@ export class DoctorsService {
         if (body.visits) {
             body.visits = await this.visitsRepository.findByIds(body.visits)
         }
-        if (body.startVacation) {
+        if (body.startVacation && body.endVacation) {
             body.startVacation = moment(body.startVacation).format("YYYY-MM-DD 00:00:ss")
-        }
-        if (body.endVacation) {
-            body.endVacation = moment(body.endVacation).format("YYYY-MM-DD 23:59:ss")
+            body.endVacation = moment(body.endVacation).format("YYYY-MM-DD 23:59:ss");
+            body.vacation = true;
+        } else {
+            body.startVacation = null
+            body.endVacation = null;
+            body.vacation = false;
         }
         if (body.users) {
             body.users = await this.usersRepository.findByIds(body.users)

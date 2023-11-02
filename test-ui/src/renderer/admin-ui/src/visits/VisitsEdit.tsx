@@ -62,12 +62,12 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
         }
     };
 
-    const change = async (doctorId: any, startDate: any) => {
-        if (startDate !== null || startDate !== '') {
+    const change = async (event: any, startDate: any) => {
+        if (event && (startDate !== null || startDate !== '')) {
             const { data } = await dataProvider.getList('doctors/available', {
                 pagination: { page: 1, perPage: 2 },
                 sort: { field: 'id', order: 'DESC' },
-                filter: { id: doctorId, startDate: startDate }
+                filter: { id: event.target.value, startDate: startDate }
             })
             if (data) {
                 setModal(true);
@@ -219,11 +219,10 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
         return (
             <Tabs className='edit-navigation' value={value} onChange={handleChange} aria-label="basic tabs example">
                 <Tab label="Գլխավոր" />
-                {permissions == 'doctor' ? record.lastVisitChecked != 'late' &&
-                    <Tab label="Կատարված աշխատանք" /> :
+                {record.lastVisitChecked == 'came' &&
                     <Tab label="Կատարված աշխատանք" />
                 }
-                {permissions !== 'doctor' &&
+                {permissions !== 'doctor' && record.lastVisitChecked == 'came' &&
                     <Tab label="Ադմինիստրացիա" />
                 }
                 <div className='client-name-tabs'>
@@ -257,7 +256,7 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
                 </CustomModal>
             }
             <EditModal resource='Այցելություն' id={id} validate={(values: any) => validateVisitsCreation({ values, permissions })} onSuccess={onSuccess} handleClose={handleClose}>
-                {permissions !== 'doctor' &&
+                {/* {permissions !== 'doctor' &&
                     <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -271,7 +270,7 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
                             ]} />
                         </>
                     </div>
-                }
+                } */}
                 <TabsNavigation />
                 <TabPanel value={value} index={0} className='not-grid'>
                     <div style={{ display: 'flex', flexDirection: isSmall ? 'column' : 'row' }}>
@@ -292,7 +291,7 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
                                                 {alreadySentAndToDisable ?
                                                     <SelectInput fullWidth disabled={true} label='Բժիշկ' optionText='name' />
                                                     :
-                                                    <SelectInput disabled={permissions == 'doctor' ? true : false} onChange={(e: any) => change(e.target.value, formData.startDate)} fullWidth validate={required('Պարտադիր դաշտ')} label='Բժիշկ' optionText='name' />
+                                                    <SelectInput disabled={permissions == 'doctor' ? true : false} onChange={(e: any) => change(e, formData.startDate)} fullWidth validate={required('Պարտադիր դաշտ')} label='Բժիշկ' optionText='name' />
                                                 }
                                             </ReferenceInput>
                                             {clientId ?

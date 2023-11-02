@@ -4,7 +4,7 @@ export const validateVisitsCreation = ({ values, permissions }: any) => {
         errors.doctors = 'ra.validation.required';
     }
     if (values.clients == null) {
-        errors.doctors = 'ra.validation.required';
+        errors.clients = 'ra.validation.required';
     }
     if (values.treatments) {
         errors.treatments = values.treatments.map((child: any) => {
