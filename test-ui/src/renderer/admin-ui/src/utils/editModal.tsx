@@ -31,7 +31,7 @@ export const EditModal = ({ resource, id, validate, onSuccess, handleClose, chil
                 {(permissions == 'doctor' && record.disabled) ? <></> :
                     <>
                         <PostSaveButton />
-                        {permissions != 'doctor' ? existSentSalary > -1 ?
+                        {/* {permissions != 'doctor' ? existSentSalary > -1 ?
                             <DeleteWithConfirmButton
                                 className='button-red'
                                 style={{ marginLeft: '25px' }}
@@ -40,7 +40,7 @@ export const EditModal = ({ resource, id, validate, onSuccess, handleClose, chil
                             /> :
                             <DeleteWithUndoButton className='button-red' style={{ marginLeft: '25px' }} label='Ջնջել' />
                             : <></>
-                        }
+                        } */}
                         {/* {permissions == 'doctor' && record.lastVisitChecked == 'late' &&
                             <DeleteWithUndoButton className='button-red' style={{ marginLeft: '25px' }} label='Ջնջել' />
                         } */}

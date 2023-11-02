@@ -19,6 +19,7 @@ const CustomRemoveButton = ({ onClick }: any) => {
     const { index } = useSimpleFormIteratorItem();
     const { fields }: any = useFieldArray({ name: 'feeHistory' });
     return (
+        fields.length !== 0 ?
         <RemoveIcon
             titleAccess={fields[index].fromClinic ? 'Կլինիկայի կողմից վճարված' : fields[index].feeSentToSalary ? 'Հնարավոր չէ հեռացնել, արդեն հաշվարկված է աշխատավարձում' : fields[index].feeSentToDoctor ? 'Հնարավոր չէ հեռացնել, պետք է հետ կանչել, հեռացնելու համար' : ''}
             style={{
@@ -26,7 +27,7 @@ const CustomRemoveButton = ({ onClick }: any) => {
                 color: fields[index] ? fields[index].feeSentToDoctor ? 'grey' : fields[index].fromClinic ? 'grey' : 'red' : 'red'
             }}
             onClick={fields[index] ? fields[index].feeSentToDoctor ? null : fields[index].fromClinic ? null : onClick : onClick}
-        />
+        /> : null
     )
 };
 

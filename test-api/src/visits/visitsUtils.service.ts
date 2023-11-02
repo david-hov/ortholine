@@ -72,6 +72,7 @@ export class VisitsUtilsService {
             )
             .where(qb => {
                 qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
+                qb.andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
                 if (roleData && roleData.name === 'doctor') {
                     qb.andWhere('doctors.id = :doctorId', { doctorId: roleData.user[0].doctors.id })
                 } else {

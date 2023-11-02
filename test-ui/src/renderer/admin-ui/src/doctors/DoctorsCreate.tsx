@@ -70,6 +70,7 @@ export const DoctorsCreate = ({ open }: { open: boolean }) => {
                     <TextInput validate={required('Պարտադիր դաշտ')} fullWidth source='name' label='Անուն Ազգանուն Հայրանուն' />
                     <TextInput validate={required('Պարտադիր դաշտ')} fullWidth source='shortName' label='Կարճ անուն' />
                     <PercentageInput />
+                    <TextInput fullWidth source='calendarId' label='CALENDAR ID' />
                 <ColorPicker />
                 <TextInput disabled validate={required('Պարտադիր դաշտ')} label='Գույն' source='color' />
                 </div>

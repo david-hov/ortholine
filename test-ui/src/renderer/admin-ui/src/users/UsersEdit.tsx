@@ -46,18 +46,18 @@ export const UsersEdit = ({ open, id }: { open: boolean; id?: string }) => {
     };
 
     {/* Google Calendar */}
-    const saveEmailToken = async (record: any) => {
-        const data = await dataProvider.update('users', {
-            id: record.id,
-            data: record,
-            previousData: {}
-        })
-        if (data) {
-            showNotification('Պահպանված է', '', 'success', 2000);
-            setTokenBody(null)
-            refresh();
-        }
-    };
+    // const saveEmailToken = async (record: any) => {
+    //     const data = await dataProvider.update('users', {
+    //         id: record.id,
+    //         data: record,
+    //         previousData: {}
+    //     })
+    //     if (data) {
+    //         showNotification('Պահպանված է', '', 'success', 2000);
+    //         setTokenBody(null)
+    //         refresh();
+    //     }
+    // };
 
     return (
         <Dialog className='create-edit' open={open}>
@@ -66,7 +66,7 @@ export const UsersEdit = ({ open, id }: { open: boolean; id?: string }) => {
                 <TextInput validate={required('Պարտադիր դաշտ')} fullWidth source='username' label='Օգտանուն' />
                 <TextInput fullWidth source='newPassword' label='Փոխել գաղտնաբառ' />
                 {/* Google Calendar */}
-                {tokenBody ?
+                {/* {tokenBody ?
                     <FunctionField
                         source="last_name" // used for sorting
                         label="Name"
@@ -96,7 +96,7 @@ export const UsersEdit = ({ open, id }: { open: boolean; id?: string }) => {
                                 </div>
                         }}
                     />
-                }
+                } */}
                 <FormDataConsumer>
                     {({ formData }: any) => {
                         const roleInputValue = useController({ name: 'roles' });

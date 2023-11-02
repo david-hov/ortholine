@@ -30,6 +30,9 @@ export class Doctors {
     color: string
 
     @Column({ nullable: true })
+    calendarId: string
+
+    @Column({ nullable: true })
     percentage: number
 
     @Column({ nullable: true })

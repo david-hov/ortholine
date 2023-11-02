@@ -292,6 +292,7 @@ export const DoctorsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                 <TabPanel value={value} index={0} className='not-grid'>
                     <TextInput validate={required('Պարտադիր դաշտ')} fullWidth source='name' label='Անուն' />
                     <TextInput validate={required('Պարտադիր դաշտ')} fullWidth source='shortName' label='Կարճ անուն' />
+                    <TextInput fullWidth source='calendarId' label='CALENDAR ID' />
                     <PercentageInput />
                     <ColorPicker />
                     <TextInput style={{ width: 'fit-content' }} disabled validate={required('Պարտադիր դաշտ')} label='Գույն' source='color' />

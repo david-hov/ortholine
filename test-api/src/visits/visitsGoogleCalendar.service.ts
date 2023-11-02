@@ -29,7 +29,7 @@ export class VisitsGoogleCalendarService {
             // @ts-ignore
             const response: any = await this.calendar.events.insert({
                 auth: auth,
-                calendarId: calendarId,
+                calendarId: body.doctors.calendarId ? body.doctors.calendarId : calendarId,
                 resource: event,
             });
             console.log('Event added');
@@ -39,13 +39,13 @@ export class VisitsGoogleCalendarService {
         }
     }
 
-    async deleteEvent(googleCalendarEventId: any, accessToken: any) {
-        const auth = await this.getOAuth2Client(accessToken);
+    async deleteEvent(googleCalendarEventId: any, data: any) {
+        const auth = await this.getOAuth2Client(data.googleToken);
         try {
             // @ts-ignore
             const response: any = await this.calendar.events.delete({
                 auth: auth,
-                calendarId: 'primary',
+                calendarId: data.doctors.calendarId ? data.doctors.calendarId : 'primary',
                 eventId: googleCalendarEventId,
             });
             console.log('Event deleted:');

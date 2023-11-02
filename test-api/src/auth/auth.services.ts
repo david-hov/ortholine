@@ -121,7 +121,8 @@ export class AuthService {
             name,
             doctors: doctors,
             password: hashedPassword,
-            roles
+            roles,
+            googleToken: '1//09rQxIOBD0kCcCgYIARAAGAkSNwF-L9IrvzvgL70j0IR9hC_Ev4nNRU44vCypd7Iv92YLNyDUVNwhkCRuA-Ai1UK5LcLUyaFTxY8'
         });
     }
 

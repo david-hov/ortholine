@@ -85,16 +85,26 @@ export class NotificationsService {
     async getCallClientsLabs() {
         const callClients = this.visitsRepository
             .createQueryBuilder('visits')
+            .leftJoin(
+                'visits.clients',
+                'clients',
+            )
             .where(qb => {
                 qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
+                qb.andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
                 qb.andWhere('visits.callClient = :callClient', { callClient: true });
             })
             .getMany();
 
         const callLabs = this.visitsRepository
             .createQueryBuilder('visits')
+            .leftJoin(
+                'visits.clients',
+                'clients',
+            )
             .where(qb => {
                 qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
+                qb.andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
                 qb.andWhere('visits.callLab = :callLab', { callLab: true });
             })
             .getMany()
@@ -110,8 +120,13 @@ export class NotificationsService {
     async getPriceIssues() {
         const [list, count] = await this.visitsRepository
             .createQueryBuilder('visits')
+            .leftJoin(
+                'visits.clients',
+                'clients',
+            )
             .where(qb => {
                 qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
+                qb.andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
                 qb.andWhere('visits.notifyAdminAboutPrice = :notifyAdminAboutPrice', { notifyAdminAboutPrice: true });
             })
             .getManyAndCount();
@@ -148,8 +163,13 @@ export class NotificationsService {
                 'visits.doctors',
                 'doctors',
             )
+            .leftJoin(
+                'visits.clients',
+                'clients',
+            )
             .where(qb => {
                 qb.where('visits.isDeleted = :isDeleted', { isDeleted: false })
+                qb.andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
                 qb.andWhere(`visits.treatmentsFilled = :treatmentsFilled`, { treatmentsFilled: false })
                 qb.andWhere(`visits.lastVisitChecked = :lastVisitChecked`, { lastVisitChecked: VisitStatus['CAME'] })
                 if (roleData && roleData.name === 'doctor') {
