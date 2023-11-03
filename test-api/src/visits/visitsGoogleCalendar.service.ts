@@ -39,13 +39,13 @@ export class VisitsGoogleCalendarService {
         }
     }
 
-    async deleteEvent(googleCalendarEventId: any, data: any) {
-        const auth = await this.getOAuth2Client(data.googleToken);
+    async deleteEvent(googleCalendarEventId: any, googleToken: any, doctor: any) {
+        const auth = await this.getOAuth2Client(googleToken);
         try {
             // @ts-ignore
             const response: any = await this.calendar.events.delete({
                 auth: auth,
-                calendarId: data.doctors.calendarId ? data.doctors.calendarId : 'primary',
+                calendarId: doctor.calendarId ? doctor.calendarId : 'primary',
                 eventId: googleCalendarEventId,
             });
             console.log('Event deleted:');

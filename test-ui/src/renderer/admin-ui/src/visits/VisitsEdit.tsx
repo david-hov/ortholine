@@ -27,6 +27,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useWatch, useController } from 'react-hook-form';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import moment from 'moment';
 
 import { showNotification } from '../utils/utils';
 import { TabPanel } from '../utils/tabPanel';
@@ -62,8 +63,8 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
         }
     };
 
-    const change = async (event: any, startDate: any) => {
-        if (event && (startDate !== null || startDate !== '')) {
+    const changeDoctor = async (event: any, startDate: any) => {
+        if (event && startDate !== '') {
             const { data } = await dataProvider.getList('doctors/available', {
                 pagination: { page: 1, perPage: 2 },
                 sort: { field: 'id', order: 'DESC' },
@@ -74,6 +75,33 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
             } else {
                 setModal(false);
             }
+        }
+    }
+
+    const change = async (formData: any, startDate: any, endDateInput: any) => {
+        if (formData && startDate !== '') {
+            if (moment(startDate).isAfter(moment(formData.endDate))) {
+                endDateInput.onChange(null);
+                alert('Մեկնարկը առաջ է ավարտից')
+            } else {
+                const { data } = await dataProvider.getList('doctors/available', {
+                    pagination: { page: 1, perPage: 2 },
+                    sort: { field: 'id', order: 'DESC' },
+                    filter: { id: formData.doctors, startDate: startDate }
+                })
+                if (data) {
+                    setModal(true);
+                } else {
+                    setModal(false);
+                }
+            }
+        }
+    }
+
+    const changeEndDate = (formData: any, endDate: any, startDateInput: any) => {
+        if (moment(endDate).isBefore(moment(formData.startDate))) {
+            startDateInput.onChange(null);
+            alert('Մեկնարկը առաջ է ավարտից')
         }
     }
 
@@ -256,21 +284,6 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
                 </CustomModal>
             }
             <EditModal resource='Այցելություն' id={id} validate={(values: any) => validateVisitsCreation({ values, permissions })} onSuccess={onSuccess} handleClose={handleClose}>
-                {/* {permissions !== 'doctor' &&
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                        alignItems: 'center',
-                    }}>
-                        <>
-                            <RadioButtonGroupInput label='Մոտեցել է նշված օրը' source="lastVisitChecked" choices={[
-                                { id: 'notCame', name: 'Չի մոտեցել' },
-                                { id: 'came', name: 'Մոտեցել է' },
-                            ]} />
-                        </>
-                    </div>
-                } */}
                 <TabsNavigation />
                 <TabPanel value={value} index={0} className='not-grid'>
                     <div style={{ display: 'flex', flexDirection: isSmall ? 'column' : 'row' }}>
@@ -279,6 +292,8 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
                                 {({ formData }: any) => {
                                     let alreadySentAndToDisable = false;
                                     const feeHistoryValue = useWatch({ name: 'feeHistory' });
+                                    const startDateInput = useController({ name: 'startDate' });
+                                    const endDateInput = useController({ name: 'endDate' });
                                     const existSentSalary = feeHistoryValue && feeHistoryValue.findIndex((el: any) => el.feeSentToDoctor);
                                     if (existSentSalary > -1) {
                                         alreadySentAndToDisable = true;
@@ -291,7 +306,7 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
                                                 {alreadySentAndToDisable ?
                                                     <SelectInput fullWidth disabled={true} label='Բժիշկ' optionText='name' />
                                                     :
-                                                    <SelectInput disabled={permissions == 'doctor' ? true : false} onChange={(e: any) => change(e, formData.startDate)} fullWidth validate={required('Պարտադիր դաշտ')} label='Բժիշկ' optionText='name' />
+                                                    <SelectInput disabled={permissions == 'doctor' ? true : false} onChange={(e: any) => changeDoctor(e, formData.startDate)} fullWidth validate={required('Պարտադիր դաշտ')} label='Բժիշկ' optionText='name' />
                                                 }
                                             </ReferenceInput>
                                             {clientId ?
@@ -310,8 +325,8 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
                                                     }
                                                 </ReferenceInput>
                                             }
-                                            <DateTimeInput disabled={alreadySentAndToDisable || permissions == 'doctor' ? true : false} onChange={(e: any) => change(formData.doctors, e.target.value)} onClick={() => alreadySentAndToDisable ? null : handleClick('start')} inputProps={{ ref: inputRefStart }} validate={required('Պարտադիր դաշտ')} fullWidth label='Մեկնարկ' source='startDate' />
-                                            <DateTimeInput disabled={alreadySentAndToDisable || permissions == 'doctor' ? true : false} onClick={() => alreadySentAndToDisable ? null : handleClick('end')} inputProps={{ ref: inputRefEnd }} validate={required('Պարտադիր դաշտ')} fullWidth label='Ավարտ' source='endDate' />
+                                            <DateTimeInput disabled={alreadySentAndToDisable || permissions == 'doctor' ? true : false} onChange={(e: any) => change(formData, e.target.value, endDateInput.field)} onClick={() => alreadySentAndToDisable ? null : handleClick('start')} inputProps={{ ref: inputRefStart }} validate={required('Պարտադիր դաշտ')} fullWidth label='Մեկնարկ' source='startDate' />
+                                            <DateTimeInput disabled={alreadySentAndToDisable || permissions == 'doctor' ? true : false} onChange={(e: any) => changeEndDate(formData, e.target.value, startDateInput.field)} onClick={() => alreadySentAndToDisable ? null : handleClick('end')} inputProps={{ ref: inputRefEnd }} validate={required('Պարտադիր դաշտ')} fullWidth label='Ավարտ' source='endDate' />
                                             <ReferenceInput label="Ապահովագրություն" source="insurance" reference="insurance">
                                                 <SelectInput disabled={alreadySentAndToDisable || permissions == 'doctor' ? true : false} fullWidth label="Ապահովագրություն" optionText="name" />
                                             </ReferenceInput>
@@ -373,10 +388,11 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
                             const doctorXrayCount = formData.xRayCountByDoctor;
                             const adminPrice = formData.price - formData.xRayPrice;
                             const adminXrayCount = formData.xRayCount;
+
                             return (
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <p>Ընդհանուր վճարման ենթակա գումար - {formData.priceByDoctor || 0} Դր․</p>
-                                    {((doctorPrice != 0 && adminPrice != doctorPrice) || (doctorXrayCount != adminXrayCount)) ? <p style={{ color: 'red', fontWeight: 'bolder' }}>Առկա է անհամապատասխանություն արժեքում</p> : null}
+                                    {(adminPrice != doctorPrice || doctorXrayCount != adminXrayCount) ? <p style={{ color: 'red', fontWeight: 'bolder' }}>Առկա է անհամապատասխանություն արժեքում</p> : null}
                                     {/* {formData.insurance && formData.xRayCountInsuranceByDoctor != formData.xRayCountInsurance && <p style={{ color: 'red', fontWeight: 'bolder' }}>Առկա է անհամապատասխանություն ԱՊՊԱ արժեքում</p>} */}
                                 </div>
                             )

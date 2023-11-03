@@ -153,7 +153,7 @@ export const VisitsSendSalary = () => {
                                                     }
                                                 </div>
                                             </div>
-                                        }) : <p>Հայտերը դուրս գրված չեն</p>
+                                        }) : <p style={{textAlign: 'center'}}>Հայտերը դուրս գրված չեն</p>
                                     }
                                 </div>
                             )

@@ -84,15 +84,22 @@ export const dataProvider: DataProvider = {
                     body.priceChanged = true;
                     body.previousPrice = params.previousData.price;
                 }
+                // delete body.googleCalendarEventId;
             }
-            if (moment(body.startDate).isSame(params.previousData.startDate) &&
-                moment(body.endDate).isSame(params.previousData.endDate)) {
-                delete body.googleCalendarEventId;
-            }
+            // if (moment(body.startDate).isSame(params.previousData.startDate) &&
+            //     moment(body.endDate).isSame(params.previousData.endDate)) {
+            //     delete body.googleCalendarEventId;
+            // }
             if (body.clients != null && params.previousData.clients != null) {
                 if (params.previousData.clients != body.clients) {
                     body.clientsChanged = true;
                     body.previousClients = params.previousData.clients;
+                }
+            }
+            if (body.doctors != null && params.previousData.doctors != null) {
+                if (params.previousData.doctors != body.doctors) {
+                    body.doctorsChanged = true;
+                    body.previousDoctors = params.previousData.doctors;
                 }
             }
             if (body.balance !== null) {
@@ -104,6 +111,7 @@ export const dataProvider: DataProvider = {
                     body.balanceNotifyChanged = true;
                     body.previousBalancePrice = params.previousData.balance == null ? 0 : params.previousData.balance;
                 }
+                // delete body.googleCalendarEventId;
             }
             if (body.xRay !== null) {
                 if (params.previousData.xRay == body.xRay) {
@@ -112,6 +120,7 @@ export const dataProvider: DataProvider = {
                     body.isXRayCanged = true;
                     body.previousXray = params.previousData.xRay
                 }
+                // delete body.googleCalendarEventId;
             }
             if (body.clients !== null) {
                 if (params.previousData.clients != body.clients) {

@@ -6,6 +6,12 @@ export const validateVisitsCreation = ({ values, permissions }: any) => {
     if (values.clients == null) {
         errors.clients = 'ra.validation.required';
     }
+    if (values.startDate == null) {
+        errors.startDate = 'ra.validation.required';
+    }
+    if (values.endDate == null) {
+        errors.endDate = 'ra.validation.required';
+    }
     if (values.treatments) {
         errors.treatments = values.treatments.map((child: any) => {
             const childErrors: any = {};
@@ -32,10 +38,10 @@ export const validateVisitsCreation = ({ values, permissions }: any) => {
             return childErrors;
         });
     }
-    if (values.price == null) {
+    if (values.price == null && values.lastVisitChecked == 'came') {
         errors.price = 'ra.validation.required';
     }
-    if (values.xRayCount == null) {
+    if (values.xRayCount == null && values.lastVisitChecked == 'came') {
         errors.xRayCount = 'ra.validation.required';
     }
     if (values.feeHistory && values.feeHistory.length !== 0) {
@@ -55,7 +61,7 @@ export const validateVisitsCreation = ({ values, permissions }: any) => {
         delete errors.xRayCount;
         delete errors.price;
     }
-    if (permissions == 'doctor' && values.xRayCountByDoctor == null) {
+    if (permissions == 'doctor' && values.xRayCountByDoctor == null && values.lastVisitChecked == 'came') {
         errors.xRayCountByDoctor = 'ra.validation.required';
     }
     return errors;

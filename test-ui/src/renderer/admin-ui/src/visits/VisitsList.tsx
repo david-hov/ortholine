@@ -110,11 +110,15 @@ const LoadedGridList = ({ permissions }: any) => {
                 source='lastVisitChecked'
                 label='Կարգ.'
                 render={(record: any) => record &&
-                <SelectField style={{cursor: 'pointer'}} choices={[
-                    { id: 'notCame', name: 'Չի մոտեցել' },
-                    { id: 'came', name: 'Մոտեցել է' },
-                    { id: 'late', name: 'Ուշացում' },
-                ]} source='lastVisitChecked' onContextMenu={(e) => permissions != 'doctor' && handleClick(e, record.id)} />
+                <SelectField
+                    style={{cursor: 'pointer', fontWeight: 'bolder', color: record.lastVisitChecked == 'late' ? 'orange'
+                : record.lastVisitChecked == 'notCame' ? 'red' : 'green'}} choices={[
+                        { id: 'notCame', name: 'Չի մոտեցել' },
+                        { id: 'came', name: 'Մոտեցել է' },
+                        { id: 'late', name: 'Ուշացում' },
+                    ]} source='lastVisitChecked'
+                    onContextMenu={(e) => permissions != 'doctor' && handleClick(e, record.id)}
+                />
             }/>
             <FunctionField
                 render={(record: any) => record && <EditButton className={record.lastVisitChecked == 'came' && record.treatments.length == 0 ? 'button-error' : ''} variant='contained' />}

@@ -482,9 +482,11 @@ export class VisitsService {
         }
         if (newData.priceChanged) {
             await this.superNotificationsService.insertNotify(newData.previousPrice, newData.price, 'Արժեքի փոփոխություն', newData.id, 'visits');
+            delete newData.googleCalendarEventId;
         }
         if (newData.balanceNotifyChanged) {
             await this.superNotificationsService.insertNotify(newData.previousBalancePrice, newData.balance, 'Մնացորդի փոփոխություն', newData.clients.id, 'clients');
+            delete newData.googleCalendarEventId;
         }
         if (newData.priceByDoctor != null) {
             const settingsData = await this.settingsRepository.find();
@@ -494,6 +496,7 @@ export class VisitsService {
             } else if (allValueByDoctor == newData.price) {
                 newData.notifyAdminAboutPrice = false;
             }
+            delete newData.googleCalendarEventId;
         }
         // Google Calendar
         if (newData.googleCalendarEventId) {
@@ -503,7 +506,19 @@ export class VisitsService {
                 },
                 relations: ['doctors']
             })
-            if (data && data.googleToken) {
+            if (newData.doctorsChanged) {
+                const previousDoctors = await this.usersRepository.findOne({
+                    where: {
+                        doctors: newData.previousDoctors
+                    },
+                    relations: ['doctors']
+                })
+                await this.visitsGoogleCalendarService.deleteEvent(newData.googleCalendarEventId, data.googleToken, previousDoctors.doctors)
+                const eventId = await this.visitsGoogleCalendarService.addEvent(newData, data.googleToken);
+                if (eventId) {
+                    newData.googleCalendarEventId = eventId;
+                }
+            } else if (data && data.googleToken) {
                 await this.visitsGoogleCalendarService.updateEvent(newData, data.googleToken)
             }
         }
@@ -554,7 +569,7 @@ export class VisitsService {
                     relations: ['doctors']
                 })
                 if (data && data.googleToken) {
-                    await this.visitsGoogleCalendarService.deleteEvent(visits.googleCalendarEventId, data)
+                    await this.visitsGoogleCalendarService.deleteEvent(visits.googleCalendarEventId, data.googleToken, data.doctors.calendarId)
                 }
             }
             this.gateway.handleMessage();
@@ -592,7 +607,7 @@ export class VisitsService {
                         relations: ['doctors']
                     })
                     if (data && data.googleToken) {
-                        await this.visitsGoogleCalendarService.deleteEvent(visits[i].googleCalendarEventId, data)
+                        await this.visitsGoogleCalendarService.deleteEvent(visits[i].googleCalendarEventId, data.googleToken, data.doctors)
                     }
                 }
             }
