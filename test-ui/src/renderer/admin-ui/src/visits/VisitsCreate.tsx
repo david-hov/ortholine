@@ -138,27 +138,15 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
                         </CustomModal>
                     }
                     <div style={{ flex: '1' }}>
-                        {/* {doctorId !== null ?
-                            <ReferenceInput fullWidth label="Բժիշկ" source="doctors" reference="doctors">
-                                <SelectInput style={{ display: 'none' }} defaultValue={doctorId} value={doctorId} fullWidth label="Բժիշկ" optionText="name" />
-                            </ReferenceInput> :
-                            <FormDataConsumer>
-                                {({ formData }: any) =>
-                                    <ReferenceInput fullWidth label="Բժիշկ" source="doctors" reference="doctors">
-                                        <SelectInput onChange={(e: any) => change(e.target.value, formData.startDate)} validate={required('Պարտադիր դաշտ')} fullWidth label="Բժիշկ" optionText="name" />
-                                    </ReferenceInput>
-                                }
-                            </FormDataConsumer>
-                        } */}
                         <FormDataConsumer>
-                                {({ formData }: any) =>
-                        <ReferenceInput fullWidth label="Բժիշկ" source="doctors" reference="doctors">
-                            <SelectInput onChange={(e: any) => change(e, formData.startDate)} validate={required('Պարտադիր դաշտ')} fullWidth label="Բժիշկ" optionText="name" />
-                        </ReferenceInput>}
-                            </FormDataConsumer>
+                            {({ formData }: any) =>
+                                <ReferenceInput fullWidth label="Բժիշկ" source="doctors" reference="doctors">
+                                    <SelectInput onChange={(e: any) => change(e, formData.startDate)} validate={required('Պարտադիր դաշտ')} fullWidth label="Բժիշկ" optionText="name" />
+                                </ReferenceInput>}
+                        </FormDataConsumer>
                         <ReferenceInput source="clients" reference="clients">
-                                <AutocompleteInput noOptionsText={<Button variant='contained' onClick={() => createClient(true)}>Ավելացնել ցանկում</Button>} validate={required('Պարտադիր դաշտ')} fullWidth label="Պացիենտ" optionText={optionRenderer} />
-                            </ReferenceInput>
+                            <AutocompleteInput noOptionsText={<Button variant='contained' onClick={() => createClient(true)}>Ավելացնել ցանկում</Button>} validate={required('Պարտադիր դաշտ')} fullWidth label="Պացիենտ" optionText={optionRenderer} />
+                        </ReferenceInput>
                         <FormDataConsumer>
                             {({ formData }: any) =>
                                 <>

@@ -31,6 +31,9 @@ const createWindow = () => {
 
     mainWindow.loadURL(APP_WINDOW_WEBPACK_ENTRY);
     mainWindow.maximize();
+    mainWindow.webContents.addListener('new-window', (event, url) => {
+        event.preventDefault();
+    });
     return mainWindow;
 };
 
