@@ -25,6 +25,7 @@ export const CalendarView = () => {
     const { isLoading, permissions } = usePermissions();
     const redirect = useRedirect();
     const [contextMenu, setContextMenu] = useState<any>(null);
+    const [eventChanged, setEventChanged] = useState<any>(false);
     const [calendarDate, setCalendarDate] = useState<any>(moment().toDate());
     const [events, setEvents] = useState<any>();
     const [doctors, setDoctors] = useState<any>();
@@ -72,7 +73,8 @@ export const CalendarView = () => {
                 sort: { field: 'id', order: 'DESC' },
                 filter: { startDate: rangeDate, endDate: rangeEndDate, doctor: permissions === 'doctor' ? localStorage.getItem('token') : '' }
             })
-            setEvents(data)
+            setEvents(data);
+            setEventChanged(false);
         }
         getEvents();
         const interval = setInterval(() => {
@@ -81,7 +83,7 @@ export const CalendarView = () => {
         return () => {
             clearInterval(interval)
         }
-    }, [rangeDate, calendarDate, contextMenu]);
+    }, [rangeDate, calendarDate, contextMenu, eventChanged]);
 
 
     const handleSelectSlot = ({ start, end }: any) => {
@@ -121,6 +123,7 @@ export const CalendarView = () => {
                     data: event,
                     previousData: {}
                 });
+                setEventChanged(true);
             }
         },
         [setEvents]
@@ -227,9 +230,9 @@ export const CalendarView = () => {
                             setRangeDate(moment(e.target.value !== '' ? moment(e.target.value).day(0).format("YYYY-MM-DD HH:mm:ss") : moment().day(0).format("YYYY-MM-DD HH:mm:ss")))
                             setEndRangeDate(moment(e.target.value !== '' ? moment(e.target.value).day(6).format("YYYY-MM-DD HH:mm:ss") : moment().day(6).format("YYYY-MM-DD HH:mm:ss")))
                         }} style={{ width: 'fit-content' }} source='calendarDate' />
-                        <Button className='button-orange' onClick={() => setCalendarDate(moment().toDate())}>
+                        {/* <Button className='button-orange' onClick={() => setRangeDate(moment(rangeDate).day(0).format("YYYY-MM-DD HH:mm:ss"))}>
                             Թարմացնել<RefreshIcon />
-                        </Button>
+                        </Button> */}
                     </div>
                 </SimpleForm>
                 <DragAndDropCalendar
