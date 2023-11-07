@@ -2,9 +2,11 @@ import { forwardRef, useEffect, useState } from "react";
 
 import { dataProvider } from "../dataProvider";
 import Logo from '../../../../../assets/images/back.png'
+import moment from "moment";
 
 export const ComponentToPrint = forwardRef((props: any, ref: any) => {
     const [printData, setPrintData] = useState<any>(null);
+    const [printDataDate, setPrintDataDate] = useState<any>(null);
     const [printInfoDetails, setPrintInfoDetails] = useState<any>(null);
     const [printImage, setPrintImage] = useState<any>(null);
     const [printDirector, setPrintDirector] = useState<any>(null);
@@ -13,8 +15,10 @@ export const ComponentToPrint = forwardRef((props: any, ref: any) => {
 
     useEffect(() => {
         const localData = localStorage.getItem('printInfo');
+        const localDataDate = localStorage.getItem('printInfoDate');
         if (localData) {
             setPrintData(JSON.parse(localData || '{}'));
+            setPrintDataDate(localDataDate ? JSON.parse(localDataDate) : moment(new Date()).format('YYYY-MM-DD'));
         }
         const getSettings = async () => {
             const { data } = await dataProvider.getList('settings', {
@@ -48,14 +52,17 @@ export const ComponentToPrint = forwardRef((props: any, ref: any) => {
                     <img src={printImage ? printImage : Logo} />
                 </div>
                 <div>
-                    {printInfoDetails !== null ? <div style={{textAlign: 'right'}} dangerouslySetInnerHTML={{__html: printInfoDetails}} />  :
+                    {printInfoDetails !== null ? <div style={{ textAlign: 'right' }} dangerouslySetInnerHTML={{ __html: printInfoDetails }} /> :
                         <>
                             <p>կլինիկա</p>
                         </>
                     }
                 </div>
             </div>
-            <p style={{ fontWeight: 'bolder' }}>Պացիենտ՝ {props.printDetails.name !== null ? props.printDetails.name : ''}</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <p style={{ fontWeight: 'bolder' }}>Պացիենտ՝ {props.printDetails.name !== null ? props.printDetails.name : ''}</p>
+                <p style={{ fontWeight: 'bolder' }}>Ամսաթիվ՝ {printDataDate !== null ? printDataDate : ''}</p>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -68,16 +75,14 @@ export const ComponentToPrint = forwardRef((props: any, ref: any) => {
                 <tbody>
                     {props.printDetails.data.data.length !== 0 &&
                         props.printDetails.data.data.map((item: any, key: number) => {
-                            if (item.price != null) {
-                                return (
-                                    <tr key={key}>
-                                        <td className="empty-row">{key + 1}</td>
-                                        <td contentEditable='true' className="treatment-row">{item.treatments.length !== 0 ? item.treatments.map((el: any, key: number) => <p key={key} style={{ margin: '0' }}>{key + 1}. {el.treatmentName}</p>) : '-'}</td>
-                                        <td contentEditable='true' className="price-row"><p style={{ margin: '0' }}>{item.insurance != null ? item.insurance.name : '-'}</p></td>
-                                        <td contentEditable='true' className="price-row"><p key={key} style={{ margin: '0' }}>{item.treatments.length !== 0 ? item.treatments.map((el: any, key: number) => <p key={key} style={{ margin: '0' }}>{key + 1}. {el.insuranceForTreatment != null ? item.insurance.name + ' - ' + el.payingPriceForTreatment : el.payingPriceForTreatment}</p>) : '-'}</p></td>
-                                    </tr>
-                                )
-                            }
+                            return (
+                                <tr key={key}>
+                                    <td className="empty-row">{key + 1}</td>
+                                    <td contentEditable='true' className="treatment-row">{item.treatments.length !== 0 ? item.treatments.map((el: any, key: number) => <p key={key} style={{ margin: '0' }}>{key + 1}. {el.treatmentName}</p>) : '-'}</td>
+                                    <td contentEditable='true' className="price-row"><p style={{ margin: '0' }}>{item.insurance != null ? item.insurance.name : '-'}</p></td>
+                                    <td contentEditable='true' className="price-row"><p key={key} style={{ margin: '0' }}>{item.treatments.length !== 0 ? item.treatments.map((el: any, key: number) => <p key={key} style={{ margin: '0' }}>{key + 1}. {el.insuranceForTreatment != null ? item.insurance.name + ' - ' + el.payingPriceForTreatment : el.payingPriceForTreatment}</p>) : '-'}</p></td>
+                                </tr>
+                            )
                         })}
                     <tr>
                         <td className="price-empty-row"></td>

@@ -9,7 +9,6 @@ import {
 } from "typeorm";
 import { Visits } from "../../visits/schemas/visits.entity";
 import { Rooms } from "../../rooms/schemas/rooms.entity";
-import { Salaries } from "../../salaries/schemas/salaries.entity";
 import { Users } from "../../auth/schemas/users.entity";
 import { Treatments } from "../../visits/schemas/treatments.entity";
 import { ClientsTemplates } from "../../clientsTemplates/schemas/clientsTemplates.entity";
@@ -77,6 +76,9 @@ export class Doctors {
         onUpdate: 'CASCADE',
     })
     rooms: Rooms
+
+    @Column({ nullable: true, default: false })
+    isDeleted: boolean
 
     @CreateDateColumn({ nullable: true })
     createdAt: Date;

@@ -7,7 +7,7 @@ import * as moment from 'moment';
 
 import { Clients, ClientsStatus } from './schemas/clients.entity';
 import { Attachments } from '../attachments/schemas/attachments.entity';
-import { Visits } from '../visits/schemas/visits.entity';
+import { Visits, VisitStatus } from '../visits/schemas/visits.entity';
 import { AppGateway } from '../app.gateway';
 import { ClientsTemplates } from '../clientsTemplates/schemas/clientsTemplates.entity';
 import { AttachmentsService } from '../attachments/attachments.service';
@@ -18,6 +18,7 @@ import { search } from '../utils/utils';
 import { SuperNotificationsService } from '../superNotifications/superNotifications.service';
 import { Deposits } from '../deposits/schemas/deposits.entity';
 import { Fee } from '../visits/schemas/fee.entity';
+import { Doctors } from '../doctors/schemas/doctors.entity';
 const path = require('path');
 
 @Injectable()
@@ -42,6 +43,8 @@ export class ClientsService {
         private readonly clientsTemplatesRepository: Repository<ClientsTemplates>,
         @InjectRepository(Fee)
         private readonly feeRepository: Repository<Fee>,
+        @InjectRepository(Doctors)
+        private readonly doctorsRepository: Repository<Doctors>,
     ) {}
 
     async insertClients(body) {
@@ -77,6 +80,42 @@ export class ClientsService {
             implant: body.implant,
             extraInfo: body.extraInfo,
         });
+        // try {
+        //     const result = await this.clientsRepository.save(newClients);
+        //     const treatments = JSON.parse(body.treatments);
+        //     if (treatments.length !== 0) {
+        //         const doctor = await this.doctorsRepository.findOne(1)
+        //         const visit = await this.visitsRepository.save({
+        //             clients: result,
+        //             startDate: body.startDate,
+        //             endDate: body.endDate,
+        //             lastVisitChecked: VisitStatus['CAME'],
+        //             treatmentsFilled: true,
+        //             doctors: doctor
+        //         });
+        //         for (const item of JSON.parse(body.treatments)) {
+        //             await this.treatmentsRepository.save({
+        //                 treatmentName: item.treatmentName,
+        //                 realPriceForTreatment: item.realPriceForTreatment,
+        //                 payingPriceForTreatment: item.realPriceForTreatment,
+        //                 visits: visit
+        //             })
+        //         }
+        //     }
+        //     return result;
+        // } catch (error) {
+        //     console.log(error)
+        //     if (error.code == 23505) {
+        //         let message = error.detail.split("=(").pop();
+        //         if (message) {
+        //             let number = message.substring(0, message.indexOf(")"))
+        //             throw new ConflictException(`Տվյալ համարը - ${number} արդեն գրանցված է`)
+        //         }
+        //         throw new ConflictException(error.detail)
+        //     } else {
+        //         throw new HttpException('Something went wrong', 500)
+        //     }
+        // }
         try {
             return await this.clientsRepository.save(newClients);
         } catch (error) {

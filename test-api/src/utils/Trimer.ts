@@ -10,6 +10,9 @@ export class TrimPipe implements PipeTransform {
 
     private trim(values) {
         Object.keys(values).forEach(key => {
+            // if (key === 'name') {
+            //     values[key] = values[key].trim()
+            // }
             if (key === 'number' || key === 'name') {
                 values[key] = values[key].trim()
             }

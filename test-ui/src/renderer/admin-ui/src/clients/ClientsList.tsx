@@ -34,6 +34,7 @@ import { dataProvider } from '../dataProvider';
 import { showNotification } from '../utils/utils';
 import { useCallback, useEffect } from 'react';
 import { useSocket } from '../utils/socketHook';
+import ImportButtonCsv from '../utils/ImportCsv';
 
 const LoadedGridList = ({ permissions }: any) => {
     const location = useLocation();
@@ -121,6 +122,8 @@ const Empty = () => (
         <Typography variant='h4' paragraph>
             Ցանկը դատարկ է
         </Typography>
+        <ImportButtonCsv/>
+
         <CreateButton
             className='guide-clients-create'
             variant='contained' />
@@ -140,6 +143,7 @@ const ClientsActions = () => {
                 variant='contained'
                 sx={{ marginLeft: 2 }}
             />
+            <ImportButtonCsv/>
         </TopToolbar>
     );
 };

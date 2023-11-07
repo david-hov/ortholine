@@ -102,24 +102,26 @@ const LoadedGridList = ({ permissions }: any) => {
             <ReferenceField emptyText='-' label="Ապահովագրություն" source="insurance" reference="insurance">
                 <TextField source='name' />
             </ReferenceField>
-            <DateField locales="fr-FR" showTime source='startDate' label='Այց․ տարեթիվ' />
-            <ReferenceField link={permissions !== 'doctor' ? (record: any, reference: any) => `/${reference}/${record.id}` : false} emptyText='-' label="Բժիշկ" source="doctors" reference="doctors">
+            <DateField emptyText='Հին այցերից' locales="fr-FR" showTime source='startDate' label='Այց․ տարեթիվ' />
+            <ReferenceField link={permissions !== 'doctor' ? (record: any, reference: any) => `/${reference}/${!record.isDeleted ? record.id : ''}` : false} emptyText='-' label="Բժիշկ" source="doctors" reference="doctors">
                 <TextField source='name' />
             </ReferenceField>
             <FunctionField
                 source='lastVisitChecked'
                 label='Կարգ.'
                 render={(record: any) => record &&
-                <SelectField
-                    style={{cursor: 'pointer', fontWeight: 'bolder', color: record.lastVisitChecked == 'late' ? 'orange'
-                : record.lastVisitChecked == 'notCame' ? 'red' : 'green'}} choices={[
-                        { id: 'notCame', name: 'Չի մոտեցել' },
-                        { id: 'came', name: 'Մոտեցել է' },
-                        { id: 'late', name: 'Ուշացում' },
-                    ]} source='lastVisitChecked'
-                    onContextMenu={(e) => permissions != 'doctor' && handleClick(e, record.id)}
-                />
-            }/>
+                    <SelectField
+                        style={{
+                            cursor: 'pointer', fontWeight: 'bolder', color: record.lastVisitChecked == 'late' ? 'orange'
+                                : record.lastVisitChecked == 'notCame' ? 'red' : 'green'
+                        }} choices={[
+                            { id: 'notCame', name: 'Չի մոտեցել' },
+                            { id: 'came', name: 'Մոտեցել է' },
+                            { id: 'late', name: 'Ուշացում' },
+                        ]} source='lastVisitChecked'
+                        onContextMenu={(e) => permissions != 'doctor' && handleClick(e, record.id)}
+                    />
+                } />
             <FunctionField
                 render={(record: any) => record && <EditButton className={record.lastVisitChecked == 'came' && record.treatments.length == 0 ? 'button-error' : ''} variant='contained' />}
             />

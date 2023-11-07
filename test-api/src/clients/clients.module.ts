@@ -17,6 +17,7 @@ import { SuperNotificationsService } from '../superNotifications/superNotificati
 import { SuperNotifications } from '../superNotifications/schemas/superNotifications.entity';
 import { Deposits } from '../deposits/schemas/deposits.entity';
 import { Fee } from '../visits/schemas/fee.entity';
+import { Doctors } from '../doctors/schemas/doctors.entity';
 
 @Module({
     imports: [
@@ -31,6 +32,7 @@ import { Fee } from '../visits/schemas/fee.entity';
             SuperNotifications,
             Deposits,
             Fee,
+            Doctors,
         ]),
         AttachmentsModule,
     ],

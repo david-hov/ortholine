@@ -17,7 +17,7 @@ const ImportButtonCsv = (props: any) => {
                 return label;
             },
             transform: (value: any) => {
-                value = isNaN(value) ? value.replace(/[,]/g, '').trim() : value;
+                // value = isNaN(value) ? value.replace(/[,]/g, '').trim() : value;
                 return value;
             },
         },

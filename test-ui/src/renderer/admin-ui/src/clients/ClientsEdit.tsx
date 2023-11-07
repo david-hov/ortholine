@@ -33,6 +33,7 @@ import {
     NumberField,
     BulkDeleteButton,
     NumberInput,
+    DateInput,
 } from 'react-admin';
 import { Box, Button, Dialog, Stack } from '@mui/material';
 import VisitsIcon from '@mui/icons-material/Assignment';
@@ -51,6 +52,7 @@ import { ComponentToPrint } from './PrintClientData';
 import { CustomModal } from '../utils/customModal';
 import { EditModal } from '../utils/editModal';
 import { CustomDateInput } from '../utils/dateInput';
+import moment from 'moment';
 
 const optionRenderer = (choice: any) => {
     return `${choice.name}${choice.doctors && choice.doctors.name ? ` - ${choice.doctors.name}` : ''}`;
@@ -94,6 +96,7 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
     const [opened, openModalFile] = useState(false);
     const [template, createTemplate] = useState(false)
     const [modalExtraInfo, setModalForExtraInfo] = useState(false);
+    const [modalOpenPrintPage, setModalOpenPrintPage] = useState(false);
     const [loading, setLoading] = useState(false);
     const [clientFees, setClientFees] = useState<any>(null);
     const [clientInsuranceFees, setClientInsuranceFees] = useState(null);
@@ -247,7 +250,11 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
 
     const handleSubmitPrintData = (data: any) => {
         localStorage.setItem('printInfo', JSON.stringify(data.printInfo));
+        if (data.date) {
+            localStorage.setItem('printInfoDate', JSON.stringify(data.date));
+        }
         setModalForExtraInfo(false);
+        setModalOpenPrintPage(true);
     };
 
     const TabsNavigation = () => {
@@ -286,10 +293,15 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
         if (printInfo) {
             localStorage.removeItem('printInfo')
         }
+        const printInfoDate = localStorage.getItem('printInfoDate');
+        if (printInfoDate) {
+            localStorage.removeItem('printInfoDate')
+        }
         if (selectedIds.length !== 0) {
             unselect(selectedIds);
         }
-        setPrintDetails(null)
+        setPrintDetails(null);
+        setModalOpenPrintPage(false);
     }
 
     const PostBulkActionButtonsToDelete = (props: any) => {
@@ -340,17 +352,23 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                         padding: '10px',
                     }}>
                         <Form onSubmit={handleSubmitPrintData}>
-                            <ArrayInput defaultValue={[]} label='Հավելյալ ինֆո' source='printInfo'>
-                                <SimpleFormIterator>
-                                    <TextInput fullWidth label='Տեքստ' source='text' />
-                                </SimpleFormIterator>
-                            </ArrayInput>
-                            <Button type='submit'>Պահպանել</Button>
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                            }}>
+                                <DateInput source='date' />
+                                <ArrayInput defaultValue={[]} label='Հավելյալ ինֆո' source='printInfo'>
+                                    <SimpleFormIterator>
+                                        <TextInput fullWidth label='Տեքստ' source='text' />
+                                    </SimpleFormIterator>
+                                </ArrayInput>
+                                <Button type='submit'>Պահպանել</Button>
+                            </div>
                         </Form>
                     </div>
                 </CustomModal>
             }
-            {printDetails && modalExtraInfo == false &&
+            {printDetails && modalOpenPrintPage &&
                 <CustomModal open={printDetails} handleClose={() => closePrintModal()} >
                     <div style={{
                         width: '90%',
@@ -382,8 +400,8 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                         </div>
                         {permissions != 'doctor' &&
                             <div className='clients-edit-pairs'>
-                                    <TextInput validate={required('Պարտադիր դաշտ')} fullWidth source='number' label='Հեռ․' />
-                                    <BooleanInput className='client-boolean' label='Շտապ այց' source='isWaiting' />
+                                <TextInput validate={required('Պարտադիր դաշտ')} fullWidth source='number' label='Հեռ․' />
+                                <BooleanInput className='client-boolean' label='Շտապ այց' source='isWaiting' />
                             </div>
                         }
                         <div className='clients-edit-pairs'>
@@ -456,7 +474,7 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                         }
                     </TabPanel>
                     <TabPanel value={value} index={1} className='not-grid'>
-                        <ReferenceArrayField filter={{isDeleted: false, lastVisitChecked: 'came'}} pagination={<Pagination />} perPage={10} label='Visits' reference='visits' source='visits'>
+                        <ReferenceArrayField filter={{ isDeleted: false, lastVisitChecked: 'came' }} pagination={<Pagination />} perPage={10} label='Visits' reference='visits' source='visits'>
                             <Datagrid className='clients-visits-table' bulkActionButtons={<PostBulkActionButtons />} optimized>
                                 <FunctionField
                                     source='treatments'
@@ -493,16 +511,21 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                                 />
                                 <FunctionField
                                     label='Վճար.'
-                                    render={(record: any) => record && record.insurance !== null ? <p style={{ margin: '0' }}>{record.fee !== null ? record.fee.toLocaleString() : 0}</p> : <p style={{ margin: '0' }}>{record.fee}</p>}
+                                    render={(record: any) => record && record.insurance !== null ? <p style={{ margin: '0' }}>{record.fee !== null ? record.fee.toLocaleString() : 0}</p> : <p style={{ margin: '0' }}>{record.fee || '-'}</p>}
                                 />
                                 <FunctionField
                                     label='Մնաց.'
                                     render={(record: any) => record && record.balance !== null ? <p style={{ margin: '0', color: record.balance <= 0 ? 'green' : 'red', fontWeight: 'bolder' }}>{Math.abs(record.balance)}</p> : '-'}
                                 />
-                                <ReferenceField sortable={false} label='Բժիշկ' source='doctors' reference='doctors'>
+                                <ReferenceField emptyText='-' sortable={false} label='Բժիշկ' source='doctors' reference='doctors'>
                                     <TextField source='shortName' />
                                 </ReferenceField>
-                                <DateField sortable={false} source='startDate' label='Ամս.' />
+                                <FunctionField
+                                    label='Ամս.'
+                                    render={(record: any) => {
+                                        return record && moment(record.startDate).format("YYYY") == '2010' ? '-' : <DateField emptyText='-' sortable={false} source='startDate' label='Ամս.' />
+                                    }
+                                    } />
                                 <EditButton label='' />
                             </Datagrid>
                         </ReferenceArrayField>

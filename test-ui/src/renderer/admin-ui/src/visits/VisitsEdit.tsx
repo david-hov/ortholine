@@ -247,10 +247,10 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
         return (
             <Tabs className='edit-navigation' value={value} onChange={handleChange} aria-label="basic tabs example">
                 <Tab label="Գլխավոր" />
-                {record.lastVisitChecked == 'came' &&
+                {record.lastVisitChecked == 'came' && record.doctors != 1 &&
                     <Tab label="Կատարված աշխատանք" />
                 }
-                {permissions !== 'doctor' && record.lastVisitChecked == 'came' &&
+                {permissions !== 'doctor' && record.lastVisitChecked == 'came' && record.doctors != 1 &&
                     <Tab label="Ադմինիստրացիա" />
                 }
                 <div className='client-name-tabs'>
@@ -306,7 +306,7 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
                                                 {alreadySentAndToDisable ?
                                                     <SelectInput fullWidth disabled={true} label='Բժիշկ' optionText='name' />
                                                     :
-                                                    <SelectInput disabled={permissions == 'doctor' ? true : false} onChange={(e: any) => changeDoctor(e, formData.startDate)} fullWidth validate={required('Պարտադիր դաշտ')} label='Բժիշկ' optionText='name' />
+                                                    <SelectInput disabled={permissions == 'doctor' || formData.doctors == 1 ? true : false} onChange={(e: any) => changeDoctor(e, formData.startDate)} fullWidth validate={required('Պարտադիր դաշտ')} label='Բժիշկ' optionText='name' />
                                                 }
                                             </ReferenceInput>
                                             {clientId ?
@@ -314,21 +314,21 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
                                                     {alreadySentAndToDisable ?
                                                         <SelectInput fullWidth disabled={true} label='Պացիենտ' optionText={optionRenderer} />
                                                         :
-                                                        <AutocompleteInput disabled={permissions == 'doctor' ? true : false} fullWidth validate={required('Պարտադիր դաշտ')} label='Պացիենտ' optionText={optionRenderer} />
+                                                        <AutocompleteInput disabled={permissions == 'doctor' || formData.doctors == 1 ? true : false} fullWidth validate={required('Պարտադիր դաշտ')} label='Պացիենտ' optionText={optionRenderer} />
                                                     }
                                                 </ReferenceInput> :
                                                 <ReferenceInput source="clients" reference="clients">
-                                                    {alreadySentAndToDisable || permissions == 'doctor' ?
+                                                    {alreadySentAndToDisable || permissions == 'doctor' || formData.doctors == 1 ?
                                                         <SelectInput fullWidth disabled={true} label='Պացիենտ' optionText={optionRenderer} />
                                                         :
                                                         <AutocompleteInput fullWidth validate={required('Պարտադիր դաշտ')} label='Պացիենտ' optionText={optionRenderer} />
                                                     }
                                                 </ReferenceInput>
                                             }
-                                            <DateTimeInput disabled={alreadySentAndToDisable || permissions == 'doctor' ? true : false} onChange={(e: any) => change(formData, e.target.value, endDateInput.field)} onClick={() => alreadySentAndToDisable ? null : handleClick('start')} inputProps={{ ref: inputRefStart }} validate={required('Պարտադիր դաշտ')} fullWidth label='Մեկնարկ' source='startDate' />
-                                            <DateTimeInput disabled={alreadySentAndToDisable || permissions == 'doctor' ? true : false} onChange={(e: any) => changeEndDate(formData, e.target.value, startDateInput.field)} onClick={() => alreadySentAndToDisable ? null : handleClick('end')} inputProps={{ ref: inputRefEnd }} validate={required('Պարտադիր դաշտ')} fullWidth label='Ավարտ' source='endDate' />
+                                            <DateTimeInput disabled={alreadySentAndToDisable || permissions == 'doctor' || formData.doctors == 1 ? true : false} onChange={(e: any) => change(formData, e.target.value, endDateInput.field)} onClick={() => alreadySentAndToDisable ? null : handleClick('start')} inputProps={{ ref: inputRefStart }} validate={required('Պարտադիր դաշտ')} fullWidth label='Մեկնարկ' source='startDate' />
+                                            <DateTimeInput disabled={alreadySentAndToDisable || permissions == 'doctor' || formData.doctors == 1 ? true : false} onChange={(e: any) => changeEndDate(formData, e.target.value, startDateInput.field)} onClick={() => alreadySentAndToDisable ? null : handleClick('end')} inputProps={{ ref: inputRefEnd }} validate={required('Պարտադիր դաշտ')} fullWidth label='Ավարտ' source='endDate' />
                                             <ReferenceInput label="Ապահովագրություն" source="insurance" reference="insurance">
-                                                <SelectInput disabled={alreadySentAndToDisable || permissions == 'doctor' ? true : false} fullWidth label="Ապահովագրություն" optionText="name" />
+                                                <SelectInput disabled={alreadySentAndToDisable || permissions == 'doctor' || formData.doctors == 1 ? true : false} fullWidth label="Ապահովագրություն" optionText="name" />
                                             </ReferenceInput>
                                         </div>
                                     )

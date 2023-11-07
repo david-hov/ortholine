@@ -37,7 +37,20 @@ export class DoctorsService {
         private readonly doctorSalariesRepository: Repository<DoctorSalaries>,
         @InjectRepository(ClientsTemplates)
         private readonly clientsTemplatesRepository: Repository<ClientsTemplates>,
-    ) {}
+    ) {
+        this.doctorsRepository.count().then(async (res) => {
+            if (res === 0) {
+                await this.insertDoctors({
+                    name: 'Հին բազա',
+                    percentage: 0,
+                    sum: 0,
+                    color: '...',
+                    shortName: 'Հին բազա',
+                    isDeleted: true
+                })
+            }
+        })
+    }
 
     async insertDoctors(body) {
         if (body.visits) {
@@ -47,6 +60,7 @@ export class DoctorsService {
             name: body.name,
             visits: body.visits,
             percentage: body.percentage,
+            calendarId: body.calendarId,
             sum: body.sum,
             color: body.color,
             shortName: body.shortName,
@@ -100,8 +114,10 @@ export class DoctorsService {
                 'users'
             )
             .where(qb => {
+                qb.where('doctors.id <> :id', { id: 1 })
+                qb.andWhere('doctors.isDeleted = :isDeleted', { isDeleted: false })
                 if (parsedFilter.hasOwnProperty('notHaveUser')) {
-                    qb.where('users IS NULL')
+                    qb.andWhere('users IS NULL')
                 }
             })
             .orderBy(sortData, orderDir === 'ASC' ? 'ASC' : 'DESC')
@@ -287,7 +303,12 @@ export class DoctorsService {
     async deleteDoctorss(doctorsIds): Promise<any> {
         const { ids } = doctorsIds;
         try {
-            return await this.doctorsRepository.delete(ids);
+            const result = await this.doctorsRepository.update({
+                id: In(ids),
+            },
+                { isDeleted: true },
+            );
+            return result;
         } catch (error) {
             if (error.code == 23503) {
                 throw new ConflictException(error.detail)

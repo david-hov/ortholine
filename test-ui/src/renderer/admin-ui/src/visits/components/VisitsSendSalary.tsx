@@ -80,7 +80,7 @@ export const VisitsSendSalary = () => {
                     <div>
                         <div style={{ display: 'flex', borderBottom: '1px solid', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center' }}>
                             <h4 style={{ margin: '0' }}>Կլինիկայի աշխատավարձ</h4>
-                            <ReferenceField link={(record: any) => `/doctors/${record.id}`} fullWidth source='doctors' reference='doctors'>
+                            <ReferenceField link={(record: any) => `/doctors/${!record.isDeleted ? record.id : ''}`} fullWidth source='doctors' reference='doctors'>
                                 <TextField style={{ fontSize: '1rem', fontWeight: 'bolder', color: '#e06d18' }} source='name' />
                             </ReferenceField>
                         </div>
