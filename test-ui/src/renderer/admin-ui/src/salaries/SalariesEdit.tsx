@@ -193,17 +193,37 @@ export const SalariesEdit = ({ open, id }: { open: boolean; id?: string }) => {
                 <ArrayInput disabled={permissions !== 'super' ? true : false} className='salariesEdit' label='Գումարներ' source="doctorSalaries">
                     <SimpleFormIterator disableClear disableRemove={true} disableAdd={true} disableReordering={true}>
                         <FormDataConsumer>
-                            {({ scopedFormData, formData }: any) => {
+                            {({ scopedFormData }: any) => {
                                 if (scopedFormData) {
                                     return (
                                         scopedFormData.insurance == null ?
-                                            <p>{scopedFormData.special ? scopedFormData.clientsTemplates.name : companyName}</p> :
-                                            <p title={scopedFormData.insurance.name}>{scopedFormData.insurance.name}</p>
+                                            <p style={{
+                                                width: '145px',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}>{scopedFormData.special ? scopedFormData.clientsTemplates.name : companyName}</p> :
+                                            <p style={{
+                                                width: '145px',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }} title={scopedFormData.insurance.name}>{scopedFormData.insurance.name}</p>
                                     )
                                 }
                             }}
                         </FormDataConsumer>
-                        <NumberField fullWidth label='Արժեք Դր․' source="price" />
+                        <FormDataConsumer>
+                            {({ scopedFormData, formData }: any) => {
+                                if (!scopedFormData.special) {
+                                    return <p style={{ color: 'green', fontWeight: 'bolder' }}>
+                                        <span style={{ color: 'orange', fontSize: '16px' }}>{scopedFormData.price}</span> {'->'} {(scopedFormData.price * formData.doctors.percentage) / 100}</p>
+                                } else {
+                                    return <p style={{ color: 'green', fontWeight: 'bolder' }}>
+                                        <span style={{ color: 'orange', fontSize: '16px' }}>{scopedFormData.price}</span> {'->'} {(scopedFormData.price * scopedFormData.specialPercentage) / 100}</p>
+                                }
+                            }}
+                        </FormDataConsumer>
                         <FormDataConsumer>
                             {({
                                 scopedFormData, formData
