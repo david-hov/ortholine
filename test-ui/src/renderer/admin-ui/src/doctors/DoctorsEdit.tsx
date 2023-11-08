@@ -368,17 +368,27 @@ export const DoctorsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                                                 {permissions == 'super' ? <DeleteWithConfirmButton label='' confirmTitle='Ջնջե՞լ' confirmContent='' record={scopedFormData} className='deleteButton' resource='doctorSalaries' style={{color: 'red !important', minWidth: 'fit-content', cursor: 'pointer'}} /> : null}
                                                 {/* {permissions == 'super' ? <RemoveIcon style={{color: 'red', cursor: 'pointer'}} onClick={() => removeFromList(scopedFormData)} /> : null} */}
                                                 {scopedFormData.insurance == null ?
-                                                    <p style={{ fontSize: '20px', margin: '0' }} title={scopedFormData.special ? scopedFormData.clientsTemplates.name : companyName}>{scopedFormData.special ? scopedFormData.clientsTemplates.name : companyName}</p> :
-                                                    <p style={{ fontSize: '20px', margin: '0' }} title={scopedFormData.insurance.name}>{scopedFormData.insurance.name}</p>
+                                                    <p style={{ fontSize: '20px',
+                                                    margin: '0',
+                                                    overflow: 'hidden',
+                                                    whiteSpace: 'nowrap',
+                                                    width: '150px',
+                                                    textOverflow: 'ellipsis', }} title={scopedFormData.special ? scopedFormData.clientsTemplates.name : companyName}>{scopedFormData.special ? scopedFormData.clientsTemplates.name : companyName}</p> :
+                                                    <p style={{ fontSize: '20px',
+                                                    margin: '0',
+                                                    overflow: 'hidden',
+                                                    whiteSpace: 'nowrap',
+                                                    width: '150px',
+                                                    textOverflow: 'ellipsis', }} title={scopedFormData.insurance.name}>{scopedFormData.insurance.name}</p>
                                                 }
                                                 <p style={{
                                                     fontSize: '20px',
                                                     margin: '0',
                                                     overflow: 'hidden',
                                                     whiteSpace: 'nowrap',
-                                                    width: '125px',
+                                                    width: '150px',
                                                     textOverflow: 'ellipsis',
-                                                }}>{scopedFormData.price.toLocaleString()} դր․</p>
+                                                }}>{scopedFormData.price.toLocaleString()}</p>
                                             </div>
                                         )
                                     }}
