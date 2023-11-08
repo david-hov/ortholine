@@ -425,8 +425,8 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                             <TextInput multiline fullWidth source='complaint' label='Դժգոհություն' />
                             <ArrayInput source='extraInfo' label='Հիշեցում'>
                                 <SimpleFormIterator disableReordering inline={true}>
-                                    <TextInput multiline fullWidth source='info' label='Հիշեցումներ' />
-                                    <CustomDateInput label='Ամսաթիվ' source='date' />
+                                    <TextInput validate={required('Պարտադիր դաշտ')} multiline fullWidth source='info' label='Հիշեցումներ' />
+                                    <CustomDateInput validate={required('Պարտադիր դաշտ')} label='Ամսաթիվ' source='date' />
                                 </SimpleFormIterator>
                             </ArrayInput>
                         </div>

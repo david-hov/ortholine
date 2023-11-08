@@ -14,6 +14,18 @@ export const validateClient = (values: any) => {
             errors.minus = 'Մուտքագրած գումարը մեծ է';
         }
     }
+    if (values.extraInfo) {
+        errors.extraInfo = values.extraInfo.map((child: any) => {
+            const childErrors: any = {};
+            if (child.date == null) {
+                childErrors.date = 'ra.validation.required';
+            }
+            if (child.date == null) {
+                childErrors.info = 'ra.validation.required';
+            }
+            return childErrors;
+        });
+    }
     if (values.diagnosis) {
         errors.diagnosis = values.diagnosis.map((child: any) => {
             const childErrors: any = {};
