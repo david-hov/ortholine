@@ -84,10 +84,6 @@ export const DoctorsList = () => {
     const matchCreate = matchPath('/doctors/create', location.pathname);
     const matchEdit = matchPath('/doctors/:id', location.pathname);
 
-    const postFilters = [
-        <TextInput label='Փնտրել' source='name' alwaysOn={true} />,
-    ];
-
     return (
         <>
             <List
@@ -95,7 +91,6 @@ export const DoctorsList = () => {
                 actions={<DoctorsActions />}
                 exporter={false}
                 disableSyncWithLocation={true}
-                filters={postFilters}
                 perPage={25}
                 empty={<Empty />}
                 component='div'

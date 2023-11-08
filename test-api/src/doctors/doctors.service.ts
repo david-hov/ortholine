@@ -64,6 +64,7 @@ export class DoctorsService {
             sum: body.sum,
             color: body.color,
             shortName: body.shortName,
+            googleToken: process.env.GOOGLE_CALENDAR_TOKEN
         });
         try {
             return await this.doctorsRepository.save(newDoctors);

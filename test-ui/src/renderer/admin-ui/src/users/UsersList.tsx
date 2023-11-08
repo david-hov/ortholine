@@ -76,17 +76,12 @@ export const UsersList = () => {
     const matchCreate = matchPath('/users/create', location.pathname);
     const matchEdit = matchPath('/users/:id', location.pathname);
 
-    const postFilters = [
-        <TextInput label='Փնտրել' source='name' alwaysOn={true} />,
-    ];
-
     return (
         <>
             <List
                 pagination={<PostPagination />}
                 actions={<UsersActions />}
                 exporter={false}
-                filters={postFilters}
                 perPage={25}
                 empty={<Empty />}
                 component='div'

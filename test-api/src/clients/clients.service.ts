@@ -80,6 +80,7 @@ export class ClientsService {
             implant: body.implant,
             extraInfo: body.extraInfo,
         });
+        // data import
         // try {
         //     const result = await this.clientsRepository.save(newClients);
         //     const treatments = JSON.parse(body.treatments);
@@ -177,7 +178,7 @@ export class ClientsService {
                 if (parsedFilter.hasOwnProperty('birthDate')) {
                     qb.andWhere(`clients.birthDate = :birthDate`, { birthDate: parsedFilter['birthDate'] })
                 }
-                if (parsedFilter.hasOwnProperty('name')) {
+                if (parsedFilter.hasOwnProperty('name') && parsedFilter.name.length >=2) {
                     qb.andWhere(`clients.name ILIKE :name`, { name: `%${parsedFilter.name.trim()}%` })
                     qb.orWhere(`clientsTemplates.name ILIKE :clientInfoName`, { clientInfoName: `%${parsedFilter.name.trim()}%` })
                     qb.orWhere(`clients.number ILIKE :number`, { number: `%${parsedFilter.name.trim()}%` })

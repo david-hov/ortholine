@@ -71,17 +71,12 @@ export const InsuranceList = () => {
     const matchCreate = matchPath('/insurance/create', location.pathname);
     const matchEdit = matchPath('/insurance/:id', location.pathname);
 
-    const postFilters = [
-        <TextInput label='Փնտրել' source='name' alwaysOn={true} />,
-    ];
-
     return (
         <>
             <List
                 pagination={<PostPagination />}
                 actions={<InsuranceActions />}
                 exporter={false}
-                filters={postFilters}
                 perPage={25}
                 empty={<Empty />}
                 component='div'

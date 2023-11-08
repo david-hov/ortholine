@@ -284,7 +284,6 @@ export const VisitsList = () => {
             <SelectInput label="Ապպա" optionText='name' />
         </ReferenceInput>,
     ];
-
     if (isLoading) return <Loading />
     return (
         <>
@@ -302,25 +301,27 @@ export const VisitsList = () => {
                 </>
                 :
                 <>
-                    <List
-                        pagination={<PostPagination />}
-                        actions={<VisitsActions permissions={permissions} />}
-                        exporter={false}
-                        disableSyncWithLocation={true}
-                        filter={clientId ? { clients: `${clientId}` } : undefined}
-                        filters={permissions == 'doctor' ? doctorFilters : postFilters}
-                        perPage={25}
-                        empty={<Empty permissions={permissions} />}
-                        component='div'
-                        sort={{ field: 'id', order: 'DESC' }}
-                    >
-                        <LoadedGridList permissions={permissions} />
-                    </List>
                     {matchCreate &&
                         <VisitsCreate open={!!matchCreate} id={clientId} permissions={permissions} />
                     }
                     {matchEdit && matchCreate == null ?
                         <VisitsEdit open={!!matchEdit} id={matchEdit?.params.id} clientId={clientId} /> : null
+                    }
+                    {matchEdit == null && matchCreate == null &&
+                        <List
+                            pagination={<PostPagination />}
+                            actions={<VisitsActions permissions={permissions} />}
+                            exporter={false}
+                            disableSyncWithLocation={true}
+                            filter={clientId ? { clients: `${clientId}` } : undefined}
+                            filters={permissions == 'doctor' ? doctorFilters : postFilters}
+                            perPage={25}
+                            empty={<Empty permissions={permissions} />}
+                            component='div'
+                            sort={{ field: 'id', order: 'DESC' }}
+                        >
+                            <LoadedGridList permissions={permissions} />
+                        </List>
                     }
                 </>
             }

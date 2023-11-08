@@ -67,17 +67,12 @@ export const LaboratoriesList = () => {
     const matchCreate = matchPath('/laboratories/create', location.pathname);
     const matchEdit = matchPath('/laboratories/:id', location.pathname);
 
-    const postFilters = [
-        <TextInput label='Փնտրել' source='name' alwaysOn={true} />,
-    ];
-
     return (
         <>
             <List
                 pagination={<PostPagination />}
                 actions={<LaboratoriesActions />}
                 exporter={false}
-                filters={postFilters}
                 perPage={25}
                 empty={<Empty />}
                 component='div'

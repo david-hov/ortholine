@@ -10,8 +10,6 @@ import { Doctors } from '../doctors/schemas/doctors.entity';
 import { Settings } from '../settings/schemas/settings.entity';
 import { AppGateway } from '../app.gateway';
 
-
-
 @Injectable()
 export class AuthService {
     constructor(
@@ -121,8 +119,7 @@ export class AuthService {
             name,
             doctors: doctors,
             password: hashedPassword,
-            roles,
-            googleToken: process.env.GOOGLE_CALENDAR_TOKEN
+            roles
         });
     }
 

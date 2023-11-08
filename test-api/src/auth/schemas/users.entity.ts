@@ -21,12 +21,6 @@ export class Users {
     @Column()
     password: string;
 
-    @Column({ nullable: true })
-    email: string;
-
-    @Column({nullable: true})
-    googleToken: string;
-
     @ManyToOne(() => Roles, (users) => users.user, {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',

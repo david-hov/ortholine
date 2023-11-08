@@ -55,6 +55,9 @@ export class PriceListsService {
                 'insurance'
             )
             .where(qb => {
+                if (parsedFilter.hasOwnProperty('name')) {
+                    qb.andWhere(`priceLists.name ILIKE :name`, { name: `%${parsedFilter.name.trim()}%` })
+                }
                 if (parsedFilter.hasOwnProperty('insurance')) {
                     if (parsedFilter.insurance !== null) {
                         qb.where('insurance.id = :id', { id: parsedFilter.insurance })

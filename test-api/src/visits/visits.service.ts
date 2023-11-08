@@ -86,6 +86,12 @@ export class VisitsService {
         }
         if (body.doctors) {
             body.doctors = await this.doctorsRepository.findOne(body.doctors);
+            if (body.doctors && body.doctors.googleToken) {
+                const eventId = await this.visitsGoogleCalendarService.addEvent(body, body.doctors.googleToken);
+                if (eventId) {
+                    body.googleCalendarEventId = eventId;
+                }
+            }
         }
         const newVisits = this.visitsRepository.create({
             price: body.price,
@@ -98,6 +104,7 @@ export class VisitsService {
             priceByDoctor: null,
             startDate: body.startDate,
             endDate: body.endDate,
+            googleCalendarEventId: body.googleCalendarEventId,
             lastVisitChecked: VisitStatus['LATE'],
             clientsTemplates: body.clients.clientsTemplates ?
                 body.clients.clientsTemplates.doctors ?
@@ -107,19 +114,6 @@ export class VisitsService {
                     true : false : false
         });
         try {
-            // Google Calendar
-            const data = await this.usersRepository.findOne({
-                where: {
-                    doctors: body.doctors
-                },
-                relations: ['doctors']
-            })
-            if (data && data.googleToken) {
-                const eventId = await this.visitsGoogleCalendarService.addEvent(body, data.googleToken);
-                if (eventId) {
-                    newVisits.googleCalendarEventId = eventId;
-                }
-            }
             const result = await this.visitsRepository.save(newVisits);
             this.gateway.handleMessage();
             return result;
@@ -191,7 +185,7 @@ export class VisitsService {
                 if (parsedFilter.hasOwnProperty('clients')) {
                     qb.andWhere(`clients.id = :clientId`, { clientId: parsedFilter.clients })
                 }
-                if (parsedFilter.hasOwnProperty('name')) {
+                if (parsedFilter.hasOwnProperty('name') && parsedFilter.name.length >=2) {
                     qb.andWhere(`clients.name ILIKE :name`, { name: `%${parsedFilter.name.trim()}%` })
                     qb.orWhere(`clients.number ILIKE :number`, { number: `%${parsedFilter.name.trim()}%` })
                         .andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
@@ -204,7 +198,7 @@ export class VisitsService {
                         qb.andWhere(`treatments.discountForTreatment = :discountForTreatment`, { discountForTreatment: 0 })
                     }
                 }
-                if (parsedFilter.hasOwnProperty('treatmentWord')) {
+                if (parsedFilter.hasOwnProperty('treatmentWord') && parsedFilter.treatmentWord.length >=2) {
                     qb.andWhere(`treatments.treatmentName ILIKE :treatmentWord`, { treatmentWord: `%${parsedFilter.treatmentWord.trim()}%` })
                 }
                 if (parsedFilter.hasOwnProperty('balance')) {
@@ -500,26 +494,27 @@ export class VisitsService {
         }
         // Google Calendar
         if (newData.googleCalendarEventId) {
-            const data = await this.usersRepository.findOne({
-                where: {
-                    doctors: newData.doctors
-                },
-                relations: ['doctors']
-            })
+            // const data = await this.usersRepository.findOne({
+            //     where: {
+            //         doctors: newData.doctors
+            //     },
+            //     relations: ['doctors']
+            // })
             if (newData.doctorsChanged) {
-                const previousDoctors = await this.usersRepository.findOne({
-                    where: {
-                        doctors: newData.previousDoctors
-                    },
-                    relations: ['doctors']
-                })
-                await this.visitsGoogleCalendarService.deleteEvent(newData.googleCalendarEventId, data.googleToken, previousDoctors.doctors)
-                const eventId = await this.visitsGoogleCalendarService.addEvent(newData, data.googleToken);
+                // const previousDoctors = await this.usersRepository.findOne({
+                //     where: {
+                //         doctors: newData.previousDoctors
+                //     },
+                //     relations: ['doctors']
+                // })
+                const previousDoctors = await this.doctorsRepository.findOne(newData.previousDoctors);
+                await this.visitsGoogleCalendarService.deleteEvent(newData.googleCalendarEventId, previousDoctors.googleToken, previousDoctors)
+                const eventId = await this.visitsGoogleCalendarService.addEvent(newData, previousDoctors.googleToken);
                 if (eventId) {
                     newData.googleCalendarEventId = eventId;
                 }
-            } else if (data && data.googleToken) {
-                await this.visitsGoogleCalendarService.updateEvent(newData, data.googleToken)
+            } else if (newData.doctors && newData.doctors.googleToken) {
+                await this.visitsGoogleCalendarService.updateEvent(newData, newData.doctors.googleToken)
             }
         }
         const result = await this.visitsRepository.save(newData);
@@ -562,14 +557,8 @@ export class VisitsService {
             await this.priceCalculationsService.updateBalanceFromDeletedVisits([visits]);
             // Google Calendar
             if (visits.googleCalendarEventId) {
-                const data = await this.usersRepository.findOne({
-                    where: {
-                        doctors: visits.doctors
-                    },
-                    relations: ['doctors']
-                })
-                if (data && data.googleToken) {
-                    await this.visitsGoogleCalendarService.deleteEvent(visits.googleCalendarEventId, data.googleToken, data.doctors.calendarId)
+                if (visits.doctors && visits.doctors.googleToken) {
+                    await this.visitsGoogleCalendarService.deleteEvent(visits.googleCalendarEventId, visits.doctors.googleToken, visits.doctors.calendarId)
                 }
             }
             this.gateway.handleMessage();
@@ -600,14 +589,8 @@ export class VisitsService {
             for (let i = 0; i < visits.length; i++) {
                 await this.attachmentsService.deleteAttachments(visits[i].visitAttachment)
                 if (visits[i].googleCalendarEventId) {
-                    const data = await this.usersRepository.findOne({
-                        where: {
-                            doctors: visits[i].doctors
-                        },
-                        relations: ['doctors']
-                    })
-                    if (data && data.googleToken) {
-                        await this.visitsGoogleCalendarService.deleteEvent(visits[i].googleCalendarEventId, data.googleToken, data.doctors)
+                    if (visits[i].doctors && visits[i].doctors.googleToken) {
+                        await this.visitsGoogleCalendarService.deleteEvent(visits[i].googleCalendarEventId, visits[i].doctors.googleToken, visits[i].doctors)
                     }
                 }
             }

@@ -25,7 +25,7 @@ export class VisitsUtilsService {
         private readonly rolesRepository: Repository<Roles>,
         @InjectRepository(Clients)
         private readonly clientsRepository: Repository<Clients>,
-    ) {}
+    ) { }
 
     async getCalendarVisitss(filter: string, limit: string, page: string, userId: string) {
         const parsedFilter = JSON.parse(filter);
@@ -214,14 +214,8 @@ export class VisitsUtilsService {
         })
         // Google Calendar
         if (visit.googleCalendarEventId) {
-            const data = await this.usersRepository.findOne({
-                where: {
-                    doctors: visit.doctors
-                },
-                relations: ['doctors']
-            })
-            if (data && data.googleToken) {
-                await this.visitsGoogleCalendarService.updateEvent(visit, data.googleToken)
+            if (visit.doctors && visit.doctors.googleToken) {
+                await this.visitsGoogleCalendarService.updateEvent(visit, visit.doctors.googleToken)
             }
         }
         await this.updateClientStatus(id);

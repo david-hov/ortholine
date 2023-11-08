@@ -80,6 +80,9 @@ export class Doctors {
     @Column({ nullable: true, default: false })
     isDeleted: boolean
 
+    @Column({nullable: true})
+    googleToken: string;
+
     @CreateDateColumn({ nullable: true })
     createdAt: Date;
 

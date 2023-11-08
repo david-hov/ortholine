@@ -77,17 +77,12 @@ export const RoomsList = () => {
     const matchCreate = matchPath('/rooms/create', location.pathname);
     const matchEdit = matchPath('/rooms/:id', location.pathname);
 
-    const postFilters = [
-        <TextInput label='Փնտրել' source='name' alwaysOn={true} />,
-    ];
-
     return (
         <>
             <List
                 pagination={<PostPagination />}
                 actions={<RoomsActions />}
                 exporter={false}
-                filters={postFilters}
                 perPage={25}
                 empty={<Empty />}
                 component='div'
