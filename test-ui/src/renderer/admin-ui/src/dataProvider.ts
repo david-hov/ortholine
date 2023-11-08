@@ -19,6 +19,11 @@ const getToken = () => {
     };
 };
 
+const disableClick = (e: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
 export const dataProvider: DataProvider = {
     getList: (resource: string, params: any) => {
         const { page, perPage } = params.pagination;
@@ -66,6 +71,7 @@ export const dataProvider: DataProvider = {
 
     update: async (resource: string, params: any) => {
         const body = params.data;
+        document.addEventListener('click', disableClick, true);
         if (body.hasOwnProperty('newClientAttachment') && body.newClientAttachment !== null && body.newClientAttachment !== undefined) {
             body.newClientAttachment = await convertFileToBase64(body.newClientAttachment);
         }
@@ -140,10 +146,12 @@ export const dataProvider: DataProvider = {
             }
         }
         return Axios.put(`${apiUrl}/${resource}/${params.id}`, body, getToken()).then(({ data }: any) => {
+            document.removeEventListener('click', disableClick, true);
             return ({
                 data: { id: data.id, ...data },
             })
         }).catch((err: any) => {
+            document.removeEventListener('click', disableClick, true);
             return Promise.reject(
                 err.response.data.message
             );
@@ -151,9 +159,12 @@ export const dataProvider: DataProvider = {
     },
 
     updateMany: (resource: string, params: any) => {
+        document.addEventListener('click', disableClick, true);
         return Axios.put(`${apiUrl}/${resource}`, params, getToken()).then(({ data }: any) => {
+            document.removeEventListener('click', disableClick, true);
             return ({ data: data.json })
         }).catch((err: any) => {
+            document.removeEventListener('click', disableClick, true);
             return Promise.reject(
                 new HttpError(
                     (err && err.message),
@@ -166,16 +177,19 @@ export const dataProvider: DataProvider = {
 
     create: async (resource: string, params: any) => {
         const body = params.data;
+        document.addEventListener('click', disableClick, true);
         if (body.hasOwnProperty('attachment') && body.attachment !== undefined) {
             body.attachment = await convertFileToBase64(body.attachment);
         } else if (body.attachment === undefined) {
             delete body.attachment
         }
         return Axios.post(`${apiUrl}/${resource}`, body, getToken()).then(({ data }: any) => {
+            document.removeEventListener('click', disableClick, true);
             return ({
                 data: data.response.data,
             })
         }).catch((err: any) => {
+            document.removeEventListener('click', disableClick, true);
             if (isArray(err.response.data.message) && err.response.data.message.length !== 0) {
                 for (let i = 0; i <= err.response.data.message.length; i++) {
                     return Promise.reject(err.response.data.message[i])
