@@ -485,7 +485,9 @@ export class VisitsService {
         if (newData.priceByDoctor != null) {
             const settingsData = await this.settingsRepository.find();
             const allValueByDoctor = newData.priceByDoctor + (newData.xRayCountByDoctor * (settingsData.length !== 0 ? settingsData[0].xRayPrice : 1000));
-            if (allValueByDoctor > newData.price || allValueByDoctor < newData.price) {
+            if (newData.price == null) {
+                newData.notifyAdminAboutPrice = true;
+            } else if (allValueByDoctor > newData.price || allValueByDoctor < newData.price) {
                 newData.notifyAdminAboutPrice = true;
             } else if (allValueByDoctor == newData.price) {
                 newData.notifyAdminAboutPrice = false;
@@ -494,19 +496,7 @@ export class VisitsService {
         }
         // Google Calendar
         if (newData.googleCalendarEventId) {
-            // const data = await this.usersRepository.findOne({
-            //     where: {
-            //         doctors: newData.doctors
-            //     },
-            //     relations: ['doctors']
-            // })
             if (newData.doctorsChanged) {
-                // const previousDoctors = await this.usersRepository.findOne({
-                //     where: {
-                //         doctors: newData.previousDoctors
-                //     },
-                //     relations: ['doctors']
-                // })
                 const previousDoctors = await this.doctorsRepository.findOne(newData.previousDoctors);
                 await this.visitsGoogleCalendarService.deleteEvent(newData.googleCalendarEventId, previousDoctors.googleToken, previousDoctors)
                 const eventId = await this.visitsGoogleCalendarService.addEvent(newData, previousDoctors.googleToken);
