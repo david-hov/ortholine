@@ -38,6 +38,7 @@ import { useNavigate } from 'react-router';
 import { dataProvider } from '../dataProvider';
 
 const LoadedGridList = ({ permissions }: any) => {
+    const { isLoading, isFetching } = useListContext();
     const refresh = useRefresh();
     const [contextMenu, setContextMenu] = useState<any>(null);
 
@@ -73,6 +74,10 @@ const LoadedGridList = ({ permissions }: any) => {
         });
         setContextMenu(null);
         refresh();
+    }
+
+    if (isLoading || isFetching) {
+        return <Loading />
     }
 
     return <>

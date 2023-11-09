@@ -36,6 +36,7 @@ import { useCallback, useEffect } from 'react';
 import { useSocket } from '../utils/socketHook';
 
 const LoadedGridList = ({ permissions }: any) => {
+    const { isLoading, isFetching } = useListContext();
     const location = useLocation();
     const refresh = useRefresh();
     const redirect = useRedirect();
@@ -86,6 +87,10 @@ const LoadedGridList = ({ permissions }: any) => {
     const PostBulkActionButtons = (props: any) => {
         return <BulkDeleteButton {...props} label='Ջնջել' />
     };
+
+    if (isLoading || isFetching) {
+        return <Loading />
+    }
 
     return (
         <Datagrid bulkActionButtons={permissions != 'doctor' ? <PostBulkActionButtons /> : false} rowStyle={postRowStyle}>
