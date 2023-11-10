@@ -218,6 +218,53 @@ const MobileList = () => {
 
 const PostPagination = (props: any) => <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />;
 
+const postFilters = [
+    <TextInput label='Փնտրել (Անուն, Հեռ․)' source='name' alwaysOn />,
+    <TextInput label='Փնտրել ըստ բառի' source='treatmentWord' alwaysOn />,
+    <CustomDateInput source='startDate' label='Սկիզբ' alwaysOn />,
+    <CustomDateInput source='endDate' label='Ավարտ' alwaysOn />,
+    <SelectInput source="lastVisitChecked" choices={[
+        { id: 'NOTCAME', name: 'Չի մոտեցել' },
+        { id: 'CAME', name: 'Մոտեցել է' },
+    ]} label='Մոտեցել է/Չի մոտեցել' />,
+    <NullableBooleanInput label='Կատարված աշխատանքները լրացված են/լրացված չեն' source='treatmentsFilled' />,
+    <NullableBooleanInput label='ԱՊՊԱ հաշիվը դուրս գրված է/դուրս գրված չէ' source='closedInsuranceStatus' />,
+    <NullableBooleanInput label='ԱՊՊԱ ռենտգեն դուրս գրված է/դուրս գրված չէ' source='closedInsuranceXrayStatus' />,
+    <NullableBooleanInput label='Այցեր որի ընթացքում կատարվել է ռենտգեն ' source='xRayCount' />,
+    <ReferenceInput label="Այցեր ապահովագրությամբ" source="insurance" reference="insurance" >
+        <SelectInput label="Ապպա" optionText='name' />
+    </ReferenceInput>,
+    <NullableBooleanInput label='Անկանխիկ գործարքներ' source='isCash' />,
+    <NullableBooleanInput label='Զեղչված աշխատանքներ' source='discountForTreatment' />,
+    <NullableBooleanInput label='Ձևավորված մնացորդ' source='balance' />,
+    <NullableBooleanInput label='Անհամապատասխանություն արժեքի մեջ' source='notifyAdminAboutPrice' />,
+    <NullableBooleanInput label='Փոխանցված աշխատավարձ' source='feeSentToDoctor' />,
+    <NullableBooleanInput label='Հաշվարկված աշխատավարձ' source='feeSentToSalary' />,
+    <NullableBooleanInput label='Փոխանցված ԱՊՊԱ աշխատավարձ' source='insuranceSalarySentToDoctor' />,
+    <NullableBooleanInput label='Հաշվարկված ԱՊՊԱ աշխատավարձ' source='insuranceSentForSalary' />,
+    <ReferenceInput label="Նշված բժ.-ի մոտ գրանցված այց" source="doctors" reference="doctors" >
+        <AutocompleteInput label="Բժիշկ" optionText='name' />
+    </ReferenceInput>,
+    <ReferenceInput label="Նշված պացիենտ-ի այցեր" source="clients" reference="clients" >
+        <AutocompleteInput label="Պացիենտ" optionText='name' />
+    </ReferenceInput>,
+    <NullableBooleanInput label='Զանգ պացիենտին' source='callClient' />,
+    <NullableBooleanInput label='Զանգ լաբ․' source='callLab' />,
+];
+
+const doctorFilters = [
+    <TextInput label='Փնտրել (Անուն, Հեռ․)' source='name' alwaysOn />,
+    <TextInput label='Փնտրել ըստ բառի' source='treatmentWord' alwaysOn />,
+    <CustomDateInput source='startDate' label='Սկիզբ' alwaysOn />,
+    <CustomDateInput source='endDate' label='Ավարտ' alwaysOn />,
+    <NullableBooleanInput label='Կատարված աշխատանքները լրացված են/լրացված չեն' source='treatmentsFilled' />,
+    <NullableBooleanInput label='Զանգ պացիենտին' source='callClient' />,
+    <NullableBooleanInput label='Զանգ լաբ․' source='callLab' />,
+    <ReferenceInput label="Այցեր ապահովագրությամբ" source="insurance" reference="insurance" >
+        <SelectInput label="Ապպա" optionText='name' />
+    </ReferenceInput>,
+];
+
 export const VisitsList = () => {
     const isSmall = useMediaQuery('(max-width:600px)');
     const { permissions, isLoading } = usePermissions();
@@ -243,52 +290,6 @@ export const VisitsList = () => {
         };
     }, [socket, onMessage])
 
-    const postFilters = [
-        <TextInput label='Փնտրել (Անուն, Հեռ․)' source='name' alwaysOn />,
-        <TextInput label='Փնտրել ըստ բառի' source='treatmentWord' alwaysOn />,
-        <CustomDateInput source='startDate' label='Սկիզբ' alwaysOn />,
-        <CustomDateInput source='endDate' label='Ավարտ' alwaysOn />,
-        <SelectInput source="lastVisitChecked" choices={[
-            { id: 'NOTCAME', name: 'Չի մոտեցել' },
-            { id: 'CAME', name: 'Մոտեցել է' },
-        ]} label='Մոտեցել է/Չի մոտեցել' />,
-        <NullableBooleanInput label='Կատարված աշխատանքները լրացված են/լրացված չեն' source='treatmentsFilled' />,
-        <NullableBooleanInput label='ԱՊՊԱ հաշիվը դուրս գրված է/դուրս գրված չէ' source='closedInsuranceStatus' />,
-        <NullableBooleanInput label='ԱՊՊԱ ռենտգեն դուրս գրված է/դուրս գրված չէ' source='closedInsuranceXrayStatus' />,
-        <NullableBooleanInput label='Այցեր որի ընթացքում կատարվել է ռենտգեն ' source='xRayCount' />,
-        <ReferenceInput label="Այցեր ապահովագրությամբ" source="insurance" reference="insurance" >
-            <SelectInput label="Ապպա" optionText='name' />
-        </ReferenceInput>,
-        <NullableBooleanInput label='Անկանխիկ գործարքներ' source='isCash' />,
-        <NullableBooleanInput label='Զեղչված աշխատանքներ' source='discountForTreatment' />,
-        <NullableBooleanInput label='Ձևավորված մնացորդ' source='balance' />,
-        <NullableBooleanInput label='Անհամապատասխանություն արժեքի մեջ' source='notifyAdminAboutPrice' />,
-        <NullableBooleanInput label='Փոխանցված աշխատավարձ' source='feeSentToDoctor' />,
-        <NullableBooleanInput label='Հաշվարկված աշխատավարձ' source='feeSentToSalary' />,
-        <NullableBooleanInput label='Փոխանցված ԱՊՊԱ աշխատավարձ' source='insuranceSalarySentToDoctor' />,
-        <NullableBooleanInput label='Հաշվարկված ԱՊՊԱ աշխատավարձ' source='insuranceSentForSalary' />,
-        <ReferenceInput label="Նշված բժ.-ի մոտ գրանցված այց" source="doctors" reference="doctors" >
-            <AutocompleteInput label="Բժիշկ" optionText='name' />
-        </ReferenceInput>,
-        <ReferenceInput label="Նշված պացիենտ-ի այցեր" source="clients" reference="clients" >
-            <AutocompleteInput label="Պացիենտ" optionText='name' />
-        </ReferenceInput>,
-        <NullableBooleanInput label='Զանգ պացիենտին' source='callClient' />,
-        <NullableBooleanInput label='Զանգ լաբ․' source='callLab' />,
-    ];
-
-    const doctorFilters = [
-        <TextInput label='Փնտրել (Անուն, Հեռ․)' source='name' alwaysOn />,
-        <TextInput label='Փնտրել ըստ բառի' source='treatmentWord' alwaysOn />,
-        <CustomDateInput source='startDate' label='Սկիզբ' alwaysOn />,
-        <CustomDateInput source='endDate' label='Ավարտ' alwaysOn />,
-        <NullableBooleanInput label='Կատարված աշխատանքները լրացված են/լրացված չեն' source='treatmentsFilled' />,
-        <NullableBooleanInput label='Զանգ պացիենտին' source='callClient' />,
-        <NullableBooleanInput label='Զանգ լաբ․' source='callLab' />,
-        <ReferenceInput label="Այցեր ապահովագրությամբ" source="insurance" reference="insurance" >
-            <SelectInput label="Ապպա" optionText='name' />
-        </ReferenceInput>,
-    ];
     if (isLoading) return <Loading />
     return (
         <>
@@ -317,7 +318,6 @@ export const VisitsList = () => {
                             pagination={<PostPagination />}
                             actions={<VisitsActions permissions={permissions} />}
                             exporter={false}
-                            disableSyncWithLocation={true}
                             filter={clientId ? { clients: `${clientId}` } : undefined}
                             filters={permissions == 'doctor' ? doctorFilters : postFilters}
                             perPage={25}
