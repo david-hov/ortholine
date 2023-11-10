@@ -295,7 +295,7 @@ export const DoctorsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                     <TextInput fullWidth source='calendarId' label='CALENDAR ID' />
                     <PercentageInput />
                     <ColorPicker />
-                    <TextInput style={{ width: 'fit-content' }} disabled validate={required('Պարտադիր դաշտ')} label='Գույն' source='color' />
+                    <TextInput style={{ display: 'none' }} disabled validate={required('Պարտադիր դաշտ')} label='Գույն' source='color' />
                 </TabPanel>
                 <TabPanel value={value} index={1} className='not-grid'>
                     {openInsuranceReports && reportData.data.length !== 0 &&

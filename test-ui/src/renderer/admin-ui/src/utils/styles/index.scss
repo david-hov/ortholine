@@ -94,6 +94,14 @@ nav {
     }
 }
 
+.sketch-picker  {
+    width: auto !important;
+
+    .flexbox-fix:nth-child(3) {
+        display: none !important;
+    }
+}
+
 .rbc-allday-cell {
     display: none;
 }
