@@ -244,11 +244,8 @@ export const CalendarView = () => {
                             <div className='vacations-list'>
                                 {vacations.map((el: any, key: any) => {
                                     return (
-                                        <p style={{
+                                        <p onClick={() => redirect(`/doctors/${el.id}`)} className='vacation-doctor' style={{
                                             gridColumn: vacations.length == 1 ? '3' : 'unset',
-                                            margin: '0',
-                                            fontWeight: '600',
-                                            color: 'green'
                                         }}>{el.shortName} ` <span style={{ color: 'red' }}>
                                                 {moment(el.startVacation).format('YYYY-MM-DD')} - {moment(el.endVacation).format('YYYY-MM-DD')}
                                             </span>{key != vacations.length - 1 ? ',' : null}

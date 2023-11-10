@@ -84,6 +84,13 @@ nav {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 7px 15px;
+
+        .vacation-doctor {
+            cursor: pointer;
+            margin: 0;
+            font-weight: 600;
+            color: green;
+        }
     }
 }
 
