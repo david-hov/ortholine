@@ -77,10 +77,10 @@ export const SalariesList = () => {
     }, [])
 
     const postFilters = [
-        <ReferenceInput source="doctors" reference="doctors" alwaysOn={true}>
+        <ReferenceInput source="doctor" reference="doctors" alwaysOn={true}>
             <AutocompleteInput onChange={() => setDoctorId(null)} label="Բժիշկ" optionText='name' />
         </ReferenceInput>,
-        <DateInput label='Ամսաթիվ' source='date' alwaysOn={true} />
+        // <DateInput label='Ամսաթիվ' source='date' alwaysOn={true} />
     ];
     if (isLoading) return <Loading />
     return (
