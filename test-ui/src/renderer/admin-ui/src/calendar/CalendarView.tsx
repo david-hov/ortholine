@@ -235,25 +235,27 @@ export const CalendarView = () => {
                             setRangeDate(moment(e.target.value !== '' ? moment(e.target.value).day(0).format("YYYY-MM-DD HH:mm:ss") : moment().day(0).format("YYYY-MM-DD HH:mm:ss")))
                             setEndRangeDate(moment(e.target.value !== '' ? moment(e.target.value).day(6).format("YYYY-MM-DD HH:mm:ss") : moment().day(6).format("YYYY-MM-DD HH:mm:ss")))
                         }} style={{ width: 'fit-content' }} source='calendarDate' />
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                        }}>
-                            <h3 style={{ margin: '0' }}>{vacations.length !== 0 ? 'Արձակուրդներ' : ''}</h3>
-                            <div className='vacations-list'>
-                                {vacations.map((el: any, key: any) => {
-                                    return (
-                                        <p onClick={() => redirect(`/doctors/${el.id}`)} className='vacation-doctor' style={{
-                                            gridColumn: vacations.length == 1 ? '3' : 'unset',
-                                        }}>{el.shortName} ` <span style={{ color: 'red' }}>
-                                                {moment(el.startVacation).format('YYYY-MM-DD')} - {moment(el.endVacation).format('YYYY-MM-DD')}
-                                            </span>{key != vacations.length - 1 ? ',' : null}
-                                        </p>
-                                    )
-                                })}
+                        {permissions == 'doctor' ? null :
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                            }}>
+                                <h3 style={{ margin: '0' }}>{vacations.length !== 0 ? 'Արձակուրդներ' : ''}</h3>
+                                <div className='vacations-list'>
+                                    {vacations.map((el: any, key: any) => {
+                                        return (
+                                            <p onClick={() => redirect(`/doctors/${el.id}`)} className='vacation-doctor' style={{
+                                                gridColumn: vacations.length == 1 ? '3' : 'unset',
+                                            }}>{el.shortName} ` <span style={{ color: 'red' }}>
+                                                    {moment(el.startVacation).format('YYYY-MM-DD')} - {moment(el.endVacation).format('YYYY-MM-DD')}
+                                                </span>{key != vacations.length - 1 ? ',' : null}
+                                            </p>
+                                        )
+                                    })}
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 </SimpleForm>
                 <DragAndDropCalendar
