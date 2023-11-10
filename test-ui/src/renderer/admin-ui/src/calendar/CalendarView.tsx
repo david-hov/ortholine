@@ -25,6 +25,7 @@ export const CalendarView = () => {
     const { isLoading, permissions } = usePermissions();
     const redirect = useRedirect();
     const [contextMenu, setContextMenu] = useState<any>(null);
+    const [vacations, setVacations] = useState<any>([]);
     const [eventChanged, setEventChanged] = useState<any>(false);
     const [calendarDate, setCalendarDate] = useState<any>(moment().toDate());
     const [events, setEvents] = useState<any>();
@@ -61,6 +62,10 @@ export const CalendarView = () => {
                 sort: { field: 'id', order: 'DESC' },
                 filter: {}
             })
+            const vacationDoctors = data.filter(el => el.vacation);
+            if (vacationDoctors.length !== 0) {
+                setVacations(vacationDoctors);
+            }
             setDoctors(data)
         }
         getDoctors();
@@ -132,7 +137,7 @@ export const CalendarView = () => {
     const resizeEvent = useCallback(
         async ({ event, start, end }: any) => {
             if (permissions !== 'doctor') {
-                if(moment(start).isSame(moment(end))) {
+                if (moment(start).isSame(moment(end))) {
                     end = moment(end).add(30, 'minutes')
                 }
                 setEvents((prev: any) => {
@@ -230,9 +235,28 @@ export const CalendarView = () => {
                             setRangeDate(moment(e.target.value !== '' ? moment(e.target.value).day(0).format("YYYY-MM-DD HH:mm:ss") : moment().day(0).format("YYYY-MM-DD HH:mm:ss")))
                             setEndRangeDate(moment(e.target.value !== '' ? moment(e.target.value).day(6).format("YYYY-MM-DD HH:mm:ss") : moment().day(6).format("YYYY-MM-DD HH:mm:ss")))
                         }} style={{ width: 'fit-content' }} source='calendarDate' />
-                        {/* <Button className='button-orange' onClick={() => setRangeDate(moment(rangeDate).day(0).format("YYYY-MM-DD HH:mm:ss"))}>
-                            Թարմացնել<RefreshIcon />
-                        </Button> */}
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                        }}>
+                            <h3 style={{ margin: '0' }}>{vacations.length !== 0 ? 'Արձակուրդներ' : ''}</h3>
+                            <div className='vacations-list'>
+                                {vacations.map((el: any, key: any) => {
+                                    return (
+                                        <p style={{
+                                            gridColumn: vacations.length == 1 ? '3' : 'unset',
+                                            margin: '0',
+                                            fontWeight: '600',
+                                            color: 'green'
+                                        }}>{el.shortName} ` <span style={{ color: 'red' }}>
+                                                {moment(el.startVacation).format('YYYY-MM-DD')} - {moment(el.endVacation).format('YYYY-MM-DD')}
+                                            </span>{key != vacations.length - 1 ? ',' : null}
+                                        </p>
+                                    )
+                                })}
+                            </div>
+                        </div>
                     </div>
                 </SimpleForm>
                 <DragAndDropCalendar

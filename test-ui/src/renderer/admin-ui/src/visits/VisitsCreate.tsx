@@ -141,7 +141,7 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
                         <FormDataConsumer>
                             {({ formData }: any) =>
                                 <ReferenceInput fullWidth label="Բժիշկ" source="doctors" reference="doctors">
-                                    <SelectInput onChange={(e: any) => change(e, formData.startDate)} validate={required('Պարտադիր դաշտ')} fullWidth label="Բժիշկ" optionText="name" />
+                                    <SelectInput onChange={(e: any) => change(e, formData.startDate)} validate={required('Պարտադիր դաշտ')} fullWidth label="Բժիշկ" optionText={optionRenderer} />
                                 </ReferenceInput>}
                         </FormDataConsumer>
                         <ReferenceInput source="clients" reference="clients">
