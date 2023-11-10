@@ -13,7 +13,8 @@ import {
 } from 'react-admin';
 import { Button, Dialog } from '@mui/material';
 import { useLocation } from 'react-router-dom';
-import jwt_decode from "jwt-decode";
+import { useController } from 'react-hook-form';
+import moment from 'moment';
 
 import { CreateModal } from '../utils/createModal';
 import { useEffect, useRef, useState } from 'react';
@@ -23,7 +24,6 @@ import Logo from '../../../../../assets/images/back.png'
 
 export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: string, permissions: string }) => {
     const location = useLocation();
-    const [doctorId, setDoctorId] = useState<any>(null);
     const redirect = useRedirect();
     const refresh = useRefresh();
     const [client, createClient] = useState(false)
@@ -48,19 +48,6 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
 
     useEffect(() => {
         const imageData = localStorage.getItem('image');
-        // if (permissions == 'doctor') {
-        //     const doctorToken = localStorage.getItem('token');
-        //     if (doctorToken) {
-        //         const decodedToken: any = jwt_decode(doctorToken);
-        //         dataProvider.getOne('users', {
-        //             id: decodedToken.sub
-        //         }).then(({ data }: any) => {
-        //             if (data.doctors) {
-        //                 setDoctorId(data.doctors);
-        //             }
-        //         })
-        //     }
-        // }
         if (imageData != 'null') {
             setImage(imageData);
         }
@@ -77,12 +64,38 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
         refresh();
     };
 
-    const change = async (event: any, startDate: any) => {
-        if (event && (startDate !== null || startDate !== '')) {
+    const changeDoctor = async (event: any, startDate: any) => {
+        if (event && (startDate != null && startDate.length != 0)) {
             const { data } = await dataProvider.getList('doctors/available', {
                 pagination: { page: 1, perPage: 2 },
                 sort: { field: 'id', order: 'DESC' },
                 filter: { id: event.target.value, startDate: startDate }
+            })
+            if (data) {
+                setModal(true);
+            } else {
+                setModal(false);
+            }
+        }
+    }
+
+    const changeEndDate = (formData: any, endDate: any, startDateInput: any) => {
+        if (moment(endDate).isBefore(moment(formData.startDate))) {
+            startDateInput.onChange(null);
+            alert('Մեկնարկը առաջ է ավարտից')
+        }
+    }
+
+    const change = async (formData: any, startDate: any, endDateInput: any) => {
+        if (formData && (startDate != null && startDate.length != 0)) {
+            if (moment(startDate).isAfter(moment(formData.endDate))) {
+                endDateInput.onChange(null);
+                alert('Մեկնարկը առաջ է ավարտից')
+            }
+            const { data } = await dataProvider.getList('doctors/available', {
+                pagination: { page: 1, perPage: 2 },
+                sort: { field: 'id', order: 'DESC' },
+                filter: { id: formData.doctors, startDate: startDate }
             })
             if (data) {
                 setModal(true);
@@ -141,19 +154,21 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
                         <FormDataConsumer>
                             {({ formData }: any) =>
                                 <ReferenceInput fullWidth label="Բժիշկ" source="doctors" reference="doctors">
-                                    <SelectInput onChange={(e: any) => change(e, formData.startDate)} validate={required('Պարտադիր դաշտ')} fullWidth label="Բժիշկ" optionText={optionRenderer} />
+                                    <SelectInput onChange={(e: any) => changeDoctor(e, formData.startDate)} validate={required('Պարտադիր դաշտ')} fullWidth label="Բժիշկ" optionText={optionRenderer} />
                                 </ReferenceInput>}
                         </FormDataConsumer>
                         <ReferenceInput source="clients" reference="clients">
                             <AutocompleteInput noOptionsText={<Button variant='contained' onClick={() => createClient(true)}>Ավելացնել ցանկում</Button>} validate={required('Պարտադիր դաշտ')} fullWidth label="Պացիենտ" optionText={optionRenderer} />
                         </ReferenceInput>
                         <FormDataConsumer>
-                            {({ formData }: any) =>
-                                <>
-                                    <DateTimeInput onChange={(e: any) => change(formData.doctors, e.target.value)} onClick={() => handleClick('start')} inputProps={{ ref: inputRefStart }} validate={required('Պարտադիր դաշտ')} fullWidth label='Մեկնարկ' defaultValue={location.state.startDate} source='startDate' />
-                                    <DateTimeInput onClick={() => handleClick('end')} inputProps={{ ref: inputRefEnd }} validate={required('Պարտադիր դաշտ')} fullWidth label='Ավարտ' defaultValue={location.state.endDate} source='endDate' />
+                            {({ formData }: any) => {
+                                const startDateInput = useController({ name: 'startDate' });
+                                const endDateInput = useController({ name: 'endDate' });
+                                return <>
+                                    <DateTimeInput onChange={(e: any) => change(formData, e.target.value, endDateInput.field)} onClick={() => handleClick('start')} inputProps={{ ref: inputRefStart }} validate={required('Պարտադիր դաշտ')} fullWidth label='Մեկնարկ' defaultValue={location.state.startDate} source='startDate' />
+                                    <DateTimeInput onClick={() => handleClick('end')} inputProps={{ ref: inputRefEnd }} onChange={(e) => changeEndDate(formData, e.target.value, startDateInput.field)} validate={required('Պարտադիր դաշտ')} fullWidth label='Ավարտ' defaultValue={location.state.endDate} source='endDate' />
                                 </>
-                            }
+                            }}
                         </FormDataConsumer>
                         <ReferenceInput fullWidth label="Ապահովագրություն" source="insurance" reference="insurance">
                             <SelectInput fullWidth label="Ապահովագրություն" optionText="name" />

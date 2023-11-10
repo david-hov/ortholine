@@ -64,7 +64,7 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
     };
 
     const changeDoctor = async (event: any, startDate: any) => {
-        if (event && startDate !== '') {
+        if (event && (startDate != null && startDate.length != 0)) {
             const { data } = await dataProvider.getList('doctors/available', {
                 pagination: { page: 1, perPage: 2 },
                 sort: { field: 'id', order: 'DESC' },
@@ -83,17 +83,16 @@ export const VisitsEdit = ({ open, id, clientId }: { open: boolean; id?: string;
             if (moment(startDate).isAfter(moment(formData.endDate))) {
                 endDateInput.onChange(null);
                 alert('Մեկնարկը առաջ է ավարտից')
+            }
+            const { data } = await dataProvider.getList('doctors/available', {
+                pagination: { page: 1, perPage: 2 },
+                sort: { field: 'id', order: 'DESC' },
+                filter: { id: formData.doctors, startDate: startDate }
+            })
+            if (data) {
+                setModal(true);
             } else {
-                const { data } = await dataProvider.getList('doctors/available', {
-                    pagination: { page: 1, perPage: 2 },
-                    sort: { field: 'id', order: 'DESC' },
-                    filter: { id: formData.doctors, startDate: startDate }
-                })
-                if (data) {
-                    setModal(true);
-                } else {
-                    setModal(false);
-                }
+                setModal(false);
             }
         }
     }
