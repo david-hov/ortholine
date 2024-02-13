@@ -412,6 +412,15 @@ button.Mui-disabled {
     color: red !important;
 }
 
+table {
+    .MuiTableCell-head {
+        span {
+            font-weight: bolder;
+            font-size: 17px;
+        }
+    }
+}
+
 .RaLink-link {
     span {
         color: #e06d18 !important;

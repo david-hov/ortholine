@@ -95,6 +95,20 @@ const LoadedGridList = ({ permissions }: any) => {
     return (
         <Datagrid bulkActionButtons={permissions != 'doctor' ? <PostBulkActionButtons /> : false} rowStyle={postRowStyle}>
             <TextField emptyText='-' source='name' label='Անուն Հայրանուն Ազգանուն' />
+            <FunctionField
+                source='extraInfo'
+                label="Հիշեցում"
+                sortable={false}
+                render={(record: any) => record.extraInfo && record.extraInfo.length !== 0 &&
+                    record.extraInfo.map((item: any) => {
+                        return (
+                            <div style={{ borderBottom: '1px solid'}}>
+                                <p style={{margin: '0'}} title={item.date}>{item.info}</p>
+                            </div>
+                        )
+                    })
+                }
+            />
             <DateField emptyText='-' label='Ծննդ․ տարեթիվ' source='birthDate' />
             {permissions == 'doctor' ? null :
                 <TextField emptyText='-' source='number' label='Հեռ․' />
