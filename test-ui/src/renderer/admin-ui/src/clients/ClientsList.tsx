@@ -88,7 +88,7 @@ const LoadedGridList = ({ permissions }: any) => {
         return <BulkDeleteButton {...props} label='Ջնջել' />
     };
 
-    if (isLoading || isFetching) {
+    if (isLoading) {
         return <Loading />
     }
 
@@ -99,14 +99,14 @@ const LoadedGridList = ({ permissions }: any) => {
                 source='extraInfo'
                 label="Հիշեցում"
                 sortable={false}
-                render={(record: any) => record.extraInfo && record.extraInfo.length !== 0 &&
+                render={(record: any) => record.extraInfo && record.extraInfo.length !== 0 ?
                     record.extraInfo.map((item: any) => {
                         return (
-                            <div style={{ borderBottom: '1px solid'}}>
-                                <p style={{margin: '0'}} title={item.date}>{item.info}</p>
+                            <div style={{ cursor:'pointer', borderBottom: '2px solid'}}>
+                                <p style={{margin: '0'}} title={item.info}>{item.date}</p>
                             </div>
                         )
-                    })
+                    }) : '-'
                 }
             />
             <DateField emptyText='-' label='Ծննդ․ տարեթիվ' source='birthDate' />
