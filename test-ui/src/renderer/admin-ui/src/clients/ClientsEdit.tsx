@@ -34,6 +34,7 @@ import {
     BulkDeleteButton,
     NumberInput,
     DateInput,
+    BooleanField,
 } from 'react-admin';
 import { Box, Button, Dialog, Stack } from '@mui/material';
 import VisitsIcon from '@mui/icons-material/Assignment';
@@ -288,6 +289,12 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
         )
     }
 
+    const postRowSx = (record: any) => {
+        return ({
+            backgroundColor: record.insuranceForTreatment && !record.closedInsuranceStatus ? '#d3929270' : 'white',
+        })
+    };
+
     const closePrintModal = () => {
         const printInfo = localStorage.getItem('printInfo');
         if (printInfo) {
@@ -485,7 +492,7 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                                         // xRayPrice = record.xRayPrice
                                         return (
                                             record && record.treatment !== null &&
-                                            <Datagrid className='clients-treatments' header={<></>} bulkActionButtons={false} data={record.treatments}>
+                                            <Datagrid rowStyle={postRowSx} className='clients-treatments' header={<></>} bulkActionButtons={false} data={record.treatments}>
                                                 <TextField style={{ textAlign: 'right' }} label={false} source='treatmentName' />
                                                 <FunctionField
                                                     source='realPriceForTreatment'

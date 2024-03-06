@@ -27,6 +27,7 @@ import { matchPath, useLocation, useNavigate } from 'react-router-dom';
 import ShowIcon from '@mui/icons-material/Visibility';
 import WaitingIcon from '@mui/icons-material/Alarm';
 import CancelIcon from '@mui/icons-material/Cancel';
+import moment from 'moment';
 
 import { ClientsCreate } from './ClientsCreate';
 import { ClientsEdit } from './ClientsEdit';
@@ -101,9 +102,12 @@ const LoadedGridList = ({ permissions }: any) => {
                 sortable={false}
                 render={(record: any) => record.extraInfo && record.extraInfo.length !== 0 ?
                     record.extraInfo.map((item: any) => {
+                        const currentDate = moment(new Date()).format("YYYY-MM-DD");
+                        const nextDay = moment(currentDate).add(1, 'days').format("YYYY-MM-DD");
+                        const alertDate = moment(item.date).isSame(nextDay, 'day');
                         return (
                             <div style={{ cursor:'pointer', borderBottom: '2px solid'}}>
-                                <p style={{margin: '0'}} title={item.info}>{item.date}</p>
+                                <p className={alertDate ? 'alert' : ''} style={{margin: '0', textAlign: 'center'}} title={item.info}>{item.date}</p>
                             </div>
                         )
                     }) : '-'
