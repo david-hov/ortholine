@@ -55,6 +55,24 @@ export class VisitsController {
 
     @Roles('super', 'administration', 'doctor')
     @UseGuards(JwtAuthGuard, RoleGuard)
+    @UsePipes(new TrimPipe())
+    @Post('sendVisitRequest')
+    async updateVisitsRequest(
+        @Res() res,
+        @Body() VisitsBody: any,
+    ) {
+        this.logger.debug(`POST/visits/:id - update visits request`, 'debug');
+        const updated = await this.visitsService.updateVisitsRequest(VisitsBody);
+        if (!updated) {
+            throw new NotFoundException('Id does not exist!');
+        }
+        return res.status(200).json({
+            message: 'Visits has been successfully updated',
+        });
+    }
+
+    @Roles('super', 'administration', 'doctor')
+    @UseGuards(JwtAuthGuard, RoleGuard)
     @Get()
     async getAllVisits(
         @Query('filter') filter: string,

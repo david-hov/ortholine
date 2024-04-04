@@ -130,6 +130,9 @@ export class Visits {
     @Column({ nullable: true, default: false })
     isDeleted: boolean
 
+    @Column({ nullable: true, default: false })
+    isClosedRequest: boolean
+
     @CreateDateColumn({ nullable: true })
     createdAt: Date;
 

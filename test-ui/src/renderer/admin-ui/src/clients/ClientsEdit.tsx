@@ -239,9 +239,21 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
 
     const PostBulkActionButtons = (props: any) => {
         const data = useRecordContext();
-        setSelectedIds(props.selectedIds)
+        setSelectedIds(props.selectedIds);
+
+        const sendVisitRequest = async (ids: any, status: boolean) => {
+            await dataProvider.sendVisitRequest({ids, status});
+            unselect(props.selectedIds);
+            refresh();
+        }
         return (
             <Fragment>
+                <Button style={{marginRight: '15px', fontWeight: 'bolder'}} onClick={() => sendVisitRequest(props.selectedIds, false)}>
+                    Բացել
+                </Button>
+                <Button style={{marginRight: '35px', fontWeight: 'bolder'}} onClick={() => sendVisitRequest(props.selectedIds, true)}>
+                    Փակել
+                </Button>
                 <Button onClick={() => getPrintData(props.selectedIds, data.name)}>
                     Տպել
                 </Button>
@@ -294,6 +306,7 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
             backgroundColor: record.insuranceForTreatment && !record.closedInsuranceStatus ? '#d3929270' : 'white',
         })
     };
+
 
     const closePrintModal = () => {
         const printInfo = localStorage.getItem('printInfo');
@@ -511,6 +524,10 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                                         )
                                     }
                                     }
+                                />
+                                <FunctionField
+                                    label='Փակ.'
+                                    render={() => <BooleanField source='isClosedRequest' />}
                                 />
                                 <FunctionField
                                     label='Ռեն.'

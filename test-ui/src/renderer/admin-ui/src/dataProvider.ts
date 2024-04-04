@@ -69,6 +69,21 @@ export const dataProvider: DataProvider = {
         }));
     },
 
+    sendVisitRequest: async (body: any) => {
+        return Axios.post(`${apiUrl}/visits/sendVisitRequest`, body, getToken()).then(({ data }: any) => {
+            document.removeEventListener('click', disableClick, true);
+            return ({
+                data: body,
+            })
+        }).catch((err: any) => {
+            console.log(err)
+            document.removeEventListener('click', disableClick, true);
+            return Promise.reject(
+                err.response.data.message
+            );
+        });
+    },
+
     update: async (resource: string, params: any) => {
         const body = params.data;
         document.addEventListener('click', disableClick, true);

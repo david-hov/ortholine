@@ -127,6 +127,15 @@ export class VisitsService {
         }
     }
 
+    async updateVisitsRequest(body: any){
+        return await this.visitsRepository.update(
+            {
+                id: In(body.ids),
+            },
+            { isClosedRequest: body.status },
+        );
+    }
+
     async getVisitss(filter: string, limit: string, page: string, orderBy: string, orderDir: string, userId: string) {
         const parsedFilter = JSON.parse(filter);
         const maxNumber = parseInt(limit);
