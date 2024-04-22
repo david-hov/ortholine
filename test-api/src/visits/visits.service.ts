@@ -306,7 +306,7 @@ export class VisitsService {
     async getManyVisits(filter: any) {
         const filterData = typeof filter === 'object' ? filter : JSON.parse(filter);
         const data = await this.visitsRepository.find({
-            where: { id: In(filterData.ids) },
+            where: { id: In(filterData.ids), isDeleted: false },
             order: {
                 startDate: 'DESC'
             },
@@ -323,6 +323,7 @@ export class VisitsService {
             .addSelect("SUM(visits.xRayCount)", "xRayCount")
             .addSelect("SUM(visits.xRayPrice)", "xRayPrice")
             .where('visits.id IN (:...ids)', { ids: filterData.ids })
+            .andWhere("visits.isDeleted = :isDeleted", { isDeleted: false })
             .getRawOne();
 
         let { realPriceSum, payingPriceSum } = await this.treatmentsRepository
@@ -334,6 +335,7 @@ export class VisitsService {
             .select("SUM(treatments.realPriceForTreatment)", "realPriceSum")
             .addSelect("SUM(treatments.payingPriceForTreatment)", "payingPriceSum")
             .where('visits.id IN (:...ids)', { ids: filterData.ids })
+            .andWhere("visits.isDeleted = :isDeleted", { isDeleted: false })
             .andWhere('treatments.insuranceForTreatment IS NULL')
             .andWhere('treatments.clientsTreatment = :client', { client: data[0].clients })
             .getRawOne();

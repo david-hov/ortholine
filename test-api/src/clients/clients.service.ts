@@ -279,13 +279,19 @@ export class ClientsService {
             .select("SUM(visits.fee)", "feeSum")
             .addSelect("SUM(visits.xRayPrice)", "xRayPrice")
             .where('visits.clients = :clients', { clients: clientsId })
+            .andWhere("visits.isDeleted = :isDeleted", { isDeleted: false })
             .getRawOne();
 
         let { realPriceSum, payingPriceSum } = await this.treatmentsRepository
             .createQueryBuilder('treatments')
+            .leftJoinAndSelect(
+                'treatments.visits',
+                'visits'
+            )
             .select("SUM(treatments.realPriceForTreatment)", "realPriceSum")
             .addSelect("SUM(treatments.payingPriceForTreatment)", "payingPriceSum")
             .where('treatments.insuranceForTreatment IS NULL')
+            .andWhere("visits.isDeleted = :isDeleted", { isDeleted: false })
             .andWhere('treatments.clientsTreatment = :clientsTreatment', { clientsTreatment: clientsId })
             .getRawOne();
 
@@ -302,6 +308,7 @@ export class ClientsService {
             )
             .select("SUM(treatments.payingPriceForTreatment)", "insurancePriceByDoctor")
             .where('clients.id = :id', { id: clientsId })
+            .andWhere("visits.isDeleted = :isDeleted", { isDeleted: false })
             .andWhere('treatments.insuranceForTreatment IS NOT NULL')
             .getRawOne();
 
