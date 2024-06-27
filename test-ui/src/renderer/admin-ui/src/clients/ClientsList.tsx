@@ -37,7 +37,7 @@ import { useCallback, useEffect } from 'react';
 import { useSocket } from '../utils/socketHook';
 
 const LoadedGridList = ({ permissions }: any) => {
-    const { isLoading, isFetching } = useListContext();
+    const { isLoading } = useListContext();
     const location = useLocation();
     const refresh = useRefresh();
     const redirect = useRedirect();
@@ -56,19 +56,19 @@ const LoadedGridList = ({ permissions }: any) => {
         if (status == 'finished') {
             redirect(`/clients/${body.id}`);
         } else {
-            body.isFinished = status
-            const { data } = await dataProvider.update('clients', {
-                id: body.id,
-                data: body,
-                previousData: {}
-            });
-            if (data) {
-                refresh();
-                showNotification('Պահպանված է', '', 'success', 2000)
-                if (data.updated.isFinished == 'notFinished' || data.updated.isFinished == 'needToCall') {
-                    redirect('create', 'visits', undefined, undefined, { clientId: data.updated.id })
-                }
-            }
+            redirect('create', 'visits', undefined, undefined, { clientId: body.id })
+            // body.isFinished = status
+            // const { data } = await dataProvider.update('clients', {
+            //     id: body.id,
+            //     data: body,
+            //     previousData: {}
+            // });
+            // if (data) {
+            //     refresh();
+            //     if (data.updated.isFinished == 'notFinished' || data.updated.isFinished == 'needToCall') {
+            //         redirect('create', 'visits', undefined, undefined, { clientId: data.updated.id })
+            //     }
+            // }
         }
     }
 

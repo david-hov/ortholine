@@ -155,7 +155,7 @@ const Header = () => {
         const { data } = await dataProvider.getList('notifications/notFinished', {
             pagination: { page: 1, perPage: 1000 },
             sort: { field: 'id', order: 'DESC' },
-            filter: { isFinished: false, isWaiting: true, notFinishedVisitNotes: true }
+            filter: { isFinished: 'needToCall', isWaiting: true, notFinishedVisitNotes: true }
         })
         const getClientsReminder = async () => {
             const { data } = await dataProvider.getList('notifications/clientsReminder', {
