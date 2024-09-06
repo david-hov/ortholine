@@ -35,6 +35,7 @@ import { dataProvider } from '../dataProvider';
 import { showNotification } from '../utils/utils';
 import { useCallback, useEffect } from 'react';
 import { useSocket } from '../utils/socketHook';
+import { Console } from 'console';
 
 const LoadedGridList = ({ permissions }: any) => {
     const { isLoading } = useListContext();
@@ -121,9 +122,16 @@ const LoadedGridList = ({ permissions }: any) => {
                 <FunctionField
                     source='isFinished'
                     label="Կարգավիճակ"
-                    render={(record: any) => record && <Button className={record.isFinished == 'finished' ? 'button-green' : record.isFinished == 'notFinished' ? 'button-orange' : 'button-error'} onClick={() => setFinished(record)} variant='contained'>
+                    render={(record: any) => {
+                        // changed
+                        let period = null;
+                        if (record.isFinished === 'needToCall' && (!record.visits[0]?.isDeleted && record.visits[0]?.startDate)) {
+                            const daysDifference = moment().diff(record.visits[0].startDate, 'days');
+                            period = daysDifference
+                        }
+                        return record && <><Button className={record.isFinished == 'finished' ? 'button-green' : record.isFinished == 'notFinished' ? 'button-orange' : 'button-error'} onClick={() => setFinished(record)} variant='contained'>
                         {record.isFinished == 'finished' ? 'Գրանցում' : record.isFinished == 'notFinished' ? 'Ավարտել' : 'Շարունակել'}
-                    </Button>}
+                    </Button> <span title='Օր անցել է վերջին այցից'>{period ? `${period} օր` : ''}</span></>}}
                 />}
             {permissions == 'doctor' ? null :
                 <FunctionField

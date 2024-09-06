@@ -579,15 +579,21 @@ export class VisitsService {
             relations: ['clients', 'doctors', 'visitAttachment']
         });
         try {
-            const result = await this.visitsRepository.update({
-                id: In(ids),
-            },
-                { isDeleted: true },
-            );
+            let result;
             if (visits.length !== 0) {
                 await this.priceCalculationsService.updateBalanceFromDeletedVisits(visits);
             }
             for (let i = 0; i < visits.length; i++) {
+                // changed
+                if (visits[i]?.price == null) {
+                    result = await this.visitsRepository.delete(visits[i]?.id);
+                } else {
+                    result = await this.visitsRepository.update({
+                        id: In(ids),
+                    },
+                        { isDeleted: true },
+                    );
+                }
                 await this.attachmentsService.deleteAttachments(visits[i].visitAttachment)
                 if (visits[i].googleCalendarEventId) {
                     if (visits[i].doctors && visits[i].doctors.googleToken) {

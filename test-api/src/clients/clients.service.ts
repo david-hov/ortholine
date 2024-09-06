@@ -143,7 +143,11 @@ export class ClientsService {
             .createQueryBuilder('clients')
             .skip(skipNumber)
             .take(maxNumber)
-            .loadAllRelationIds()
+            // changed
+            .loadAllRelationIds({
+                relations: parsedFilter.hasOwnProperty('isFinished') ? ['clientsTemplates', 'clientAttachment', 'clientsDeposits'] : ['visits', 'clientsTemplates', 'clientAttachment', 'clientsDeposits']
+            })
+            // changed
             .leftJoinAndSelect(
                 'clients.visits',
                 'visits',
@@ -164,7 +168,9 @@ export class ClientsService {
             .where(qb => {
                 qb.where('clients.isDeleted = :isDeleted', { isDeleted: false })
                 if (parsedFilter.hasOwnProperty('isFinished')) {
+                    // changed
                     qb.andWhere(`clients.isFinished = :finished`, { finished: parsedFilter.isFinished })
+                    qb.andWhere('visits.isDeleted = :isDeleted', { isDeleted: false })
                 }
                 if (parsedFilter.hasOwnProperty('fromClinic')) {
                     qb.andWhere(`clientsDeposits.fromClinic = :fromClinic`, { fromClinic: parsedFilter['fromClinic'] })
@@ -243,6 +249,7 @@ export class ClientsService {
                 }
             })
             .orderBy(sortData, orderDir === 'ASC' ? 'ASC' : 'DESC')
+            .addOrderBy('visits.startDate', 'DESC')
             .getManyAndCount();
 
         return {
