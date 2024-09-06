@@ -147,7 +147,6 @@ export class ClientsService {
             .loadAllRelationIds({
                 relations: parsedFilter.hasOwnProperty('isFinished') ? ['clientsTemplates', 'clientAttachment', 'clientsDeposits'] : ['visits', 'clientsTemplates', 'clientAttachment', 'clientsDeposits']
             })
-            // changed
             .leftJoinAndSelect(
                 'clients.visits',
                 'visits',
@@ -224,6 +223,16 @@ export class ClientsService {
                         qb.andWhere("clients.extraInfo = :extraInfo", { extraInfo: '[]' })
                     }
                 }
+                if (parsedFilter.hasOwnProperty('exactly')) {
+                    if (parsedFilter.exactly == true) {
+                        const formattedDate = moment().add(1, 'days').format('YYYY-MM-DD');
+                        qb.andWhere("clients.extraInfo != :extraInfo", { extraInfo: '[]' })
+                            .andWhere("clients.\"extraInfo\" != '[]'")
+                            .andWhere("clients.\"extraInfo\"::jsonb @> :datePattern::jsonb", { datePattern: JSON.stringify([{ date: formattedDate }]) })
+                    } else {
+                        qb.andWhere("clients.extraInfo != :extraInfo", { extraInfo: '[]' })
+                    }
+                }
                 if (parsedFilter.hasOwnProperty('future')) {
                     if (parsedFilter.future == true) {
                         qb.andWhere("clients.future != :future", { future: '[]' })
@@ -249,7 +258,6 @@ export class ClientsService {
                 }
             })
             .orderBy(sortData, orderDir === 'ASC' ? 'ASC' : 'DESC')
-            .addOrderBy('visits.startDate', 'DESC')
             .getManyAndCount();
 
         return {

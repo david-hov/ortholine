@@ -1,7 +1,7 @@
 FROM node:14.16.1-alpine AS builder
 WORKDIR /app
 COPY . .
-RUN npm ci
+RUN npm install
 ENV GENERATE_SOURCEMAP false
 RUN npm run build
 

@@ -107,8 +107,8 @@ const LoadedGridList = ({ permissions }: any) => {
                         const nextDay = moment(currentDate).add(1, 'days').format("YYYY-MM-DD");
                         const alertDate = moment(item.date).isSame(nextDay, 'day');
                         return (
-                            <div style={{ cursor:'pointer', borderBottom: '2px solid'}}>
-                                <p className={alertDate ? 'alert' : ''} style={{margin: '0', textAlign: 'center'}} title={item.info}>{item.date}</p>
+                            <div style={{ cursor: 'pointer', borderBottom: '2px solid' }}>
+                                <p className={alertDate ? 'alert' : ''} style={{ margin: '0', textAlign: 'center' }} title={item.info}>{item.date}</p>
                             </div>
                         )
                     }) : '-'
@@ -125,13 +125,19 @@ const LoadedGridList = ({ permissions }: any) => {
                     render={(record: any) => {
                         // changed
                         let period = null;
-                        if (record.isFinished === 'needToCall' && (!record.visits[0]?.isDeleted && record.visits[0]?.startDate)) {
-                            const daysDifference = moment().diff(record.visits[0].startDate, 'days');
-                            period = daysDifference
+                        if (record.isFinished === 'needToCall' && record.visits.length !== 0) {
+                            const lastCamedDay = record.visits.sort((a: any, b: any) => a.startDate - b.startDate);
+                            const daysDifference = moment().diff(lastCamedDay[0].startDate, 'days');
+                            period = daysDifference;
                         }
-                        return record && <><Button className={record.isFinished == 'finished' ? 'button-green' : record.isFinished == 'notFinished' ? 'button-orange' : 'button-error'} onClick={() => setFinished(record)} variant='contained'>
-                        {record.isFinished == 'finished' ? 'Գրանցում' : record.isFinished == 'notFinished' ? 'Ավարտել' : 'Շարունակել'}
-                    </Button> <span title='Օր անցել է վերջին այցից'>{period ? `${period} օր` : ''}</span></>}}
+                        return record && <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'flex-start',
+                        }}><Button className={record.isFinished == 'finished' ? 'button-green' : record.isFinished == 'notFinished' ? 'button-orange' : 'button-error'} onClick={() => setFinished(record)} variant='contained'>
+                                {record.isFinished == 'finished' ? 'Գրանցում' : record.isFinished == 'notFinished' ? 'Ավարտել' : 'Շարունակել'}
+                            </Button> <span style={{ fontWeight: 'bolder' }} title='Օր անցել է վերջին այցից'>{period != null ? `${period} օր` : ''}</span></div>
+                    }}
                 />}
             {permissions == 'doctor' ? null :
                 <FunctionField
@@ -177,32 +183,6 @@ const ClientsActions = () => {
 
 const PostPagination = (props: any) => <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />;
 
-const postFilters = [
-    <TextInput label='Փնտրել (Անուն, Աղբյուր, Հեռ․)' source='name' alwaysOn />,
-    <NullableBooleanInput label='Օրթոդոնտիա' source='orthodontia' />,
-    <NullableBooleanInput label='Օրթոպեդիա' source='orthopedia' />,
-    <NullableBooleanInput label='Իմպլանտ' source='implant' />,
-    <NullableBooleanInput label='Առկա է պլանայի աշխատանք' source='future' />,
-    <NullableBooleanInput label='Առկա է ախտորոշում' source='diagnosis' />,
-    <NullableBooleanInput label='Դժգոհություն' source='complaint' />,
-    <ReferenceInput label="Աղբյուր" source="clientsTemplates" reference="clientsTemplates">
-        <AutocompleteInput optionText='name' label="Աղբյուր" source='name' />
-    </ReferenceInput>,
-    <NullableBooleanInput label='Հիշեցում' source='rememberNotes' />,
-    <ReferenceInput label="Ապպա" source="insurance" reference="insurance" >
-        <SelectInput label="Ապպա" optionText='name' />
-    </ReferenceInput>,
-    <RadioButtonGroupInput label='Անկետայի կարգավիճակ' source="isFinished" choices={[
-        { id: 'finished', name: 'Ավարտված է' },
-        { id: 'notFinished', name: 'Չի ավարտվել' },
-        { id: 'needToCall', name: 'Շարունակել' },
-    ]} />,
-    <NullableBooleanInput label='Գումարի մուտք կլինիկայի կոմից' source='fromClinic' />,
-    <NullableBooleanInput label='Շտապ այց' source='isWaiting' />,
-    <NullableBooleanInput label='Կանխավճար' source='deposit' />,
-    <NullableBooleanInput label='Մնացորդ' source='balance' />,
-    <TextInput label='Փնտրել ըստ բառի ' source='searchInFutureDiagnosis' />,
-];
 
 const MobileList = ({ permissions }: any) => {
     const { data } = useListContext();
@@ -240,12 +220,41 @@ const MobileList = ({ permissions }: any) => {
 
 export const ClientsList = () => {
     const { isLoading, permissions } = usePermissions();
+    const { filterValues } = useListContext()
     const isSmall = useMediaQuery('(max-width:600px)');
     const location = useLocation();
     const history = useNavigate();
     const matchCreate = matchPath('/clients/create', location.pathname);
     const matchEdit = matchPath('/clients/:id', location.pathname);
     const socket = useSocket();
+    console.log(filterValues)
+    const postFilters = [
+        <TextInput label='Փնտրել (Անուն, Աղբյուր, Հեռ․)' source='name' alwaysOn />,
+        <NullableBooleanInput label='Օրթոդոնտիա' source='orthodontia' />,
+        <NullableBooleanInput label='Օրթոպեդիա' source='orthopedia' />,
+        <NullableBooleanInput label='Իմպլանտ' source='implant' />,
+        <NullableBooleanInput label='Առկա է պլանայի աշխատանք' source='future' />,
+        <NullableBooleanInput label='Առկա է ախտորոշում' source='diagnosis' />,
+        <NullableBooleanInput label='Դժգոհություն' source='complaint' />,
+        <ReferenceInput label="Աղբյուր" source="clientsTemplates" reference="clientsTemplates">
+            <AutocompleteInput optionText='name' label="Աղբյուր" source='name' />
+        </ReferenceInput>,
+        <NullableBooleanInput label='Հիշեցում Բոլորը' source='rememberNotes' />,
+        <NullableBooleanInput label='Հիշեցում Այսօրվա' source='exactly' />,
+        <ReferenceInput label="Ապպա" source="insurance" reference="insurance" >
+            <SelectInput label="Ապպա" optionText='name' />
+        </ReferenceInput>,
+        <RadioButtonGroupInput label='Անկետայի կարգավիճակ' source="isFinished" choices={[
+            { id: 'finished', name: 'Ավարտված է' },
+            { id: 'notFinished', name: 'Չի ավարտվել' },
+            { id: 'needToCall', name: 'Շարունակել' },
+        ]} />,
+        <NullableBooleanInput label='Գումարի մուտք կլինիկայի կոմից' source='fromClinic' />,
+        <NullableBooleanInput label='Շտապ այց' source='isWaiting' />,
+        <NullableBooleanInput label='Կանխավճար' source='deposit' />,
+        <NullableBooleanInput label='Մնացորդ' source='balance' />,
+        <TextInput label='Փնտրել ըստ բառի ' source='searchInFutureDiagnosis' />,
+    ];
 
     const onMessage = useCallback(async () => {
         history('/clients');

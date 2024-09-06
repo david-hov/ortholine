@@ -88,7 +88,7 @@ export const VisitsCreate = ({ open, id, permissions }: { open: boolean, id?: st
 
     const change = async (formData: any, startDate: any, endDateInput: any) => {
         if (formData && (startDate != null && startDate.length != 0)) {
-            if (moment(startDate).isAfter(moment(formData.endDate))) {
+            if (moment(startDate).isAfter(moment(formData.endDate)) && formData.endDate) {
                 endDateInput.onChange(null);
                 alert('Մեկնարկը առաջ է ավարտից')
             }
