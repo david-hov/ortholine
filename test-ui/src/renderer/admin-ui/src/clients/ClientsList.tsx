@@ -35,7 +35,6 @@ import { dataProvider } from '../dataProvider';
 import { showNotification } from '../utils/utils';
 import { useCallback, useEffect } from 'react';
 import { useSocket } from '../utils/socketHook';
-import { Console } from 'console';
 
 const LoadedGridList = ({ permissions }: any) => {
     const { isLoading } = useListContext();
@@ -126,7 +125,7 @@ const LoadedGridList = ({ permissions }: any) => {
                         // changed
                         let period = null;
                         if (record.isFinished === 'needToCall' && record.visits.length !== 0) {
-                            const lastCamedDay = record.visits.sort((a: any, b: any) => a.startDate - b.startDate);
+                            const lastCamedDay = record.visits.sort((a: any, b: any) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
                             const daysDifference = moment().diff(lastCamedDay[0].startDate, 'days');
                             period = daysDifference;
                         }
@@ -183,7 +182,6 @@ const ClientsActions = () => {
 
 const PostPagination = (props: any) => <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />;
 
-
 const MobileList = ({ permissions }: any) => {
     const { data } = useListContext();
     const redirect = useRedirect();
@@ -218,6 +216,34 @@ const MobileList = ({ permissions }: any) => {
     );
 }
 
+const postFilters = [
+    <TextInput label='Փնտրել (Անուն, Աղբյուր, Հեռ․)' source='name' alwaysOn />,
+    <NullableBooleanInput label='Օրթոդոնտիա' source='orthodontia' />,
+    <NullableBooleanInput label='Օրթոպեդիա' source='orthopedia' />,
+    <NullableBooleanInput label='Իմպլանտ' source='implant' />,
+    <NullableBooleanInput label='Առկա է պլանայի աշխատանք' source='future' />,
+    <NullableBooleanInput label='Առկա է ախտորոշում' source='diagnosis' />,
+    <NullableBooleanInput label='Դժգոհություն' source='complaint' />,
+    <ReferenceInput label="Աղբյուր" source="clientsTemplates" reference="clientsTemplates">
+        <AutocompleteInput optionText='name' label="Աղբյուր" source='name' />
+    </ReferenceInput>,
+    <NullableBooleanInput label='Հիշեցում Բոլորը' source='rememberNotes' />,
+    <NullableBooleanInput label='Հիշեցում Այսօրվա' source='exactly' />,
+    <ReferenceInput label="Ապպա" source="insurance" reference="insurance" >
+        <SelectInput label="Ապպա" optionText='name' />
+    </ReferenceInput>,
+    <RadioButtonGroupInput label='Անկետայի կարգավիճակ' source="isFinished" choices={[
+        { id: 'finished', name: 'Ավարտված է' },
+        { id: 'notFinished', name: 'Չի ավարտվել' },
+        { id: 'needToCall', name: 'Շարունակել' },
+    ]} />,
+    <NullableBooleanInput label='Գումարի մուտք կլինիկայի կոմից' source='fromClinic' />,
+    <NullableBooleanInput label='Շտապ այց' source='isWaiting' />,
+    <NullableBooleanInput label='Կանխավճար' source='deposit' />,
+    <NullableBooleanInput label='Մնացորդ' source='balance' />,
+    <TextInput label='Փնտրել ըստ բառի ' source='searchInFutureDiagnosis' />,
+];
+
 export const ClientsList = () => {
     const { isLoading, permissions } = usePermissions();
     const { filterValues } = useListContext()
@@ -227,34 +253,6 @@ export const ClientsList = () => {
     const matchCreate = matchPath('/clients/create', location.pathname);
     const matchEdit = matchPath('/clients/:id', location.pathname);
     const socket = useSocket();
-    console.log(filterValues)
-    const postFilters = [
-        <TextInput label='Փնտրել (Անուն, Աղբյուր, Հեռ․)' source='name' alwaysOn />,
-        <NullableBooleanInput label='Օրթոդոնտիա' source='orthodontia' />,
-        <NullableBooleanInput label='Օրթոպեդիա' source='orthopedia' />,
-        <NullableBooleanInput label='Իմպլանտ' source='implant' />,
-        <NullableBooleanInput label='Առկա է պլանայի աշխատանք' source='future' />,
-        <NullableBooleanInput label='Առկա է ախտորոշում' source='diagnosis' />,
-        <NullableBooleanInput label='Դժգոհություն' source='complaint' />,
-        <ReferenceInput label="Աղբյուր" source="clientsTemplates" reference="clientsTemplates">
-            <AutocompleteInput optionText='name' label="Աղբյուր" source='name' />
-        </ReferenceInput>,
-        <NullableBooleanInput label='Հիշեցում Բոլորը' source='rememberNotes' />,
-        <NullableBooleanInput label='Հիշեցում Այսօրվա' source='exactly' />,
-        <ReferenceInput label="Ապպա" source="insurance" reference="insurance" >
-            <SelectInput label="Ապպա" optionText='name' />
-        </ReferenceInput>,
-        <RadioButtonGroupInput label='Անկետայի կարգավիճակ' source="isFinished" choices={[
-            { id: 'finished', name: 'Ավարտված է' },
-            { id: 'notFinished', name: 'Չի ավարտվել' },
-            { id: 'needToCall', name: 'Շարունակել' },
-        ]} />,
-        <NullableBooleanInput label='Գումարի մուտք կլինիկայի կոմից' source='fromClinic' />,
-        <NullableBooleanInput label='Շտապ այց' source='isWaiting' />,
-        <NullableBooleanInput label='Կանխավճար' source='deposit' />,
-        <NullableBooleanInput label='Մնացորդ' source='balance' />,
-        <TextInput label='Փնտրել ըստ բառի ' source='searchInFutureDiagnosis' />,
-    ];
 
     const onMessage = useCallback(async () => {
         history('/clients');
