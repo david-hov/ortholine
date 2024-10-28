@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import { dataProvider } from '../dataProvider';
-import { StartTour } from '../utils/guide/Guide';
 import Logo from '../../../../../assets/images/back.png'
 
 export const Dashboard = () => {
@@ -37,15 +36,6 @@ export const Dashboard = () => {
                 width: '90%',
                 height: '90%',
             }} src={image ? image : Logo} />
-            <div style={{
-                position: 'absolute',
-                bottom: '0',
-                right: '20px',
-                width: '100%',
-                textAlign: 'right',
-            }}>
-                <StartTour />
-            </div>
         </div>
     );
 };

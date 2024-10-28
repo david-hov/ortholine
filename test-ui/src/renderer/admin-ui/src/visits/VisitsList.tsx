@@ -124,7 +124,7 @@ const LoadedGridList = ({ permissions }: any) => {
                             { id: 'came', name: 'Մոտեցել է' },
                             { id: 'late', name: 'Ուշացում' },
                         ]} source='lastVisitChecked'
-                        onContextMenu={(e) => permissions != 'doctor' && handleClick(e, record.id)}
+                        onContextMenu={(e: any) => permissions != 'doctor' && handleClick(e, record.id)}
                     />
                 } />
             <FunctionField

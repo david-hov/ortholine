@@ -84,15 +84,15 @@ export class VisitsService {
         if (body.insurance) {
             body.insurance = await this.insuranceRepository.findOne(body.insurance);
         }
-        if (body.doctors) {
-            body.doctors = await this.doctorsRepository.findOne(body.doctors);
-            if (body.doctors && body.doctors.googleToken) {
-                const eventId = await this.visitsGoogleCalendarService.addEvent(body, body.doctors.googleToken);
-                if (eventId) {
-                    body.googleCalendarEventId = eventId;
-                }
-            }
-        }
+        // if (body.doctors) {
+        //     body.doctors = await this.doctorsRepository.findOne(body.doctors);
+        //     if (body.doctors && body.doctors.googleToken) {
+        //         const eventId = await this.visitsGoogleCalendarService.addEvent(body, body.doctors.googleToken);
+        //         if (eventId) {
+        //             body.googleCalendarEventId = eventId;
+        //         }
+        //     }
+        // }
         const newVisits = this.visitsRepository.create({
             price: body.price,
             fee: body.fee,
@@ -104,7 +104,7 @@ export class VisitsService {
             priceByDoctor: null,
             startDate: body.startDate,
             endDate: body.endDate,
-            googleCalendarEventId: body.googleCalendarEventId,
+            // googleCalendarEventId: body.googleCalendarEventId,
             lastVisitChecked: VisitStatus['LATE'],
             clientsTemplates: body.clients.clientsTemplates ?
                 body.clients.clientsTemplates.doctors ?
