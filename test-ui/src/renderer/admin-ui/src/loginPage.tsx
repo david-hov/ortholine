@@ -45,8 +45,8 @@ export const LoginPage = () => {
 
     const handleSubmitSettings = (evt: any) => {
         evt.preventDefault();
-        localStorage.setItem('engine-ip', `http://${formInput.length == 0 ? '192' : formInput}:3001`);
-        localStorage.setItem('engine-socket-ip', `http://${formInput.length == 0 ? '192' : formInput}:4001`);
+        localStorage.setItem('engine-ip', `http://${formInput.length == 0 ? '192' : formInput.trim()}:3001`);
+        localStorage.setItem('engine-socket-ip', `http://${formInput.length == 0 ? '192' : formInput.trim()}:4001`);
         window.location.reload()
     };
 

@@ -67,7 +67,7 @@ export const VisitsTreatments = ({ permissions }: any) => {
                             const insurancePriceForTreatment = useController({ name: getSource('insurancePriceForTreatment'), defaultValue: 0 });
                             const insuranceInputValue = useWatch({ name: getSource('insuranceForTreatment'), defaultValue: null });
                             const treatmentPriceForInputValue = useWatch({ name: getSource('realPriceForTreatment'), defaultValue: 0 });
-                            const treatmentPriceInput = useController({ name: getSource('payingPriceForTreatment'), defaultValue: 0 });
+                            const treatmentPriceInput = useController({ name: getSource('payingPriceForTreatment') });
                             const change = (data: any) => {
                                 let value = 0;
                                 if (data == '' || data == 0) {
@@ -100,10 +100,10 @@ export const VisitsTreatments = ({ permissions }: any) => {
 
                             return (
                                 <>
-                                    <NumberInput defaultValue={0} source={getSource('realPriceForTreatment')} onChange={(e: any) => changePrice(e)} type='tel' min={0} validate={required('Պարտադիր դաշտ')} label='Կատարված աշխ. արժեք' />
-                                    <NumberInput defaultValue={0} source={getSource('payingPriceForTreatment')} type='tel' min={0} {...rest} validate={required('Պարտադիր դաշտ')} label='Վճարման ենթակա գումար' />
+                                    <NumberInput  source={getSource('realPriceForTreatment')} onChange={(e: any) => changePrice(e)} type='tel' min={0} validate={required('Պարտադիր դաշտ')} label='Կատարված աշխ. արժեք' />
+                                    <NumberInput  source={getSource('payingPriceForTreatment')} type='tel' min={0} {...rest} validate={required('Պարտադիր դաշտ')} label='Վճարման ենթակա գումար' />
                                     {typeof insuranceInputValue == 'string' || insuranceInputValue == null ?
-                                        <NumberInput defaultValue={0} source={getSource('discountForTreatment')} onChange={(e: any) => change(e.target.value)} type='tel' min={0} max={100} validate={required('Պարտադիր դաշտ')} label='Զեղչ' /> :
+                                        <NumberInput source={getSource('discountForTreatment')} onChange={(e: any) => change(e.target.value)} type='tel' min={0} max={100} validate={required('Պարտադիր դաշտ')} label='Զեղչ' /> :
                                         <>
                                             <ReferenceArrayInput validate={required('Պարտադիր դաշտ')} source={getSource('priceListsForOneTreatment')} filter={{ insurance: insuranceInputValue !== null ? insuranceInputValue.hasOwnProperty('id') ? insuranceInputValue.id : insuranceInputValue : null }} reference="priceLists">
                                                 <AutocompleteArrayInput validate={required('Պարտադիր դաշտ')} clearOnBlur={false} onChange={(e: any) => changeInsurancePrice(e)} label='Աշխատանք' optionText="name" />

@@ -13,6 +13,13 @@ export const validateVisitsCreation = ({ values, permissions }: any) => {
         errors.endDate = 'ra.validation.required';
     }
     if (values.treatments) {
+    }
+    if (!values.treatments || !values.treatments.length) {
+        errors.treatments = 'ra.validation.required';
+    } else {
+        if (values.treatments.length === 0) {
+            errors.treatments = 'ra.validation.required';
+        }
         errors.treatments = values.treatments.map((child: any) => {
             const childErrors: any = {};
             if (child.treatmentName == null || child.treatmentName == '') {
@@ -59,6 +66,9 @@ export const validateVisitsCreation = ({ values, permissions }: any) => {
             }
             return childErrors;
         });
+    }
+    if (permissions == 'administration' || permissions == 'super') {
+        delete errors.treatments
     }
     if (permissions == 'doctor') {
         delete errors.xRayCount;
