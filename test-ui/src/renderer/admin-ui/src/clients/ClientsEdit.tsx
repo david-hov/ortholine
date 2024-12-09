@@ -476,6 +476,17 @@ export const ClientsEdit = ({ open, id }: { open: boolean; id?: string }) => {
                                 <FunctionField
                                     render={(record: any) => record &&
                                         <div>
+                                            {record.notCalculatedVisits &&
+                                            <div>
+                                                <h1 style={{ color: 'red' }}>Առկա են չհաշվարկված այցեր</h1>
+                                                <div>
+                                                    {record?.notCalculatedVisits.map((el: any) => {
+                                                        return <Button style={{ marginRight: '15px', marginBottom: '15px' }} variant='contained' onClick={() => redirect(`/visits/${el}`)}>Տեսնել այցը</Button>
+                                                    })}
+                                                </div>
+                                                </div>
+
+                                            }
                                             <h2 style={{ display: 'flex', justifyContent: 'space-between' }}>Կանխավճար - {record.deposit || 0} Դր․ {permissions == 'super' && <Button variant='contained' onClick={() => restart()}>Զրոյացնել</Button>}</h2>
                                             <h2 style={{ display: 'flex', justifyContent: 'space-between' }}>Մնացորդ - {record.balance > 0 && record.balance || 0} Դր․</h2>
                                         </div>

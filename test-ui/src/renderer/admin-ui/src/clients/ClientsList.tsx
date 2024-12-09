@@ -220,6 +220,7 @@ const postFilters = [
     <TextInput label='Փնտրել (Անուն, Աղբյուր, Հեռ․)' source='name' alwaysOn />,
     <NullableBooleanInput label='Օրթոդոնտիա' source='orthodontia' />,
     <NullableBooleanInput label='Օրթոպեդիա' source='orthopedia' />,
+    <NullableBooleanInput label='Մնացորդի կիսատ հաշվարկ' source='balanceNotOkay' />,
     <NullableBooleanInput label='Իմպլանտ' source='implant' />,
     <NullableBooleanInput label='Առկա է պլանայի աշխատանք' source='future' />,
     <NullableBooleanInput label='Առկա է ախտորոշում' source='diagnosis' />,

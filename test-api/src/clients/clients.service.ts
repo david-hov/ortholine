@@ -45,7 +45,7 @@ export class ClientsService {
         private readonly feeRepository: Repository<Fee>,
         @InjectRepository(Doctors)
         private readonly doctorsRepository: Repository<Doctors>,
-    ) {}
+    ) { }
 
     async insertClients(body) {
         if (body.attachment) {
@@ -152,6 +152,10 @@ export class ClientsService {
                 'visits',
             )
             .leftJoinAndSelect(
+                'visits.doctors',
+                'doctor',
+            )
+            .leftJoinAndSelect(
                 'clients.clientsTemplates',
                 'clientsTemplates',
                 `clients.isDeleted = :isDeleted`, { isDeleted: false }
@@ -166,6 +170,13 @@ export class ClientsService {
             )
             .where(qb => {
                 qb.where('clients.isDeleted = :isDeleted', { isDeleted: false })
+                if (parsedFilter.hasOwnProperty('balanceNotOkay')) {
+                    if (parsedFilter['balanceNotOkay'] == true) {
+                        qb.andWhere('doctor.name != :doctorName', { doctorName: 'Հին բազա' })
+                        qb.andWhere('visits.price IS NULL')
+                        qb.andWhere('visits.lastVisitChecked = :status', { status: VisitStatus.CAME })
+                    }
+                }
                 if (parsedFilter.hasOwnProperty('isFinished')) {
                     // changed
                     qb.andWhere(`clients.isFinished = :finished`, { finished: parsedFilter.isFinished })
@@ -183,7 +194,7 @@ export class ClientsService {
                 if (parsedFilter.hasOwnProperty('birthDate')) {
                     qb.andWhere(`clients.birthDate = :birthDate`, { birthDate: parsedFilter['birthDate'] })
                 }
-                if (parsedFilter.hasOwnProperty('name') && parsedFilter.name.length >=2) {
+                if (parsedFilter.hasOwnProperty('name') && parsedFilter.name.length >= 2) {
                     qb.andWhere(`clients.name ILIKE :name`, { name: `%${parsedFilter.name.trim()}%` })
                     qb.orWhere(`clientsTemplates.name ILIKE :clientInfoName`, { clientInfoName: `%${parsedFilter.name.trim()}%` })
                     qb.orWhere(`clients.number ILIKE :number`, { number: `%${parsedFilter.name.trim()}%` })
@@ -353,7 +364,7 @@ export class ClientsService {
     async removePreviousInsertedFile(body) {
         let a = this.removeAttachment(body.src)
         let b = this.removeAttachment(body.thumbnail)
-        return await Promise.all([a,b])
+        return await Promise.all([a, b])
     }
 
     async restartClientsDeposit(id) {
@@ -489,12 +500,13 @@ export class ClientsService {
         try {
             const result = await this.clientsRepository.update({
                 id: In(ids),
-              },
-              {
-                isDeleted: true,
-                number: null,
-                isFinished: ClientsStatus['FINISHED'],
-                isWaiting: false  },
+            },
+                {
+                    isDeleted: true,
+                    number: null,
+                    isFinished: ClientsStatus['FINISHED'],
+                    isWaiting: false
+                },
             );
             if (clientsData.length !== 0) {
                 for (let i = 0; i < clientsData.length; i++) {
@@ -519,13 +531,86 @@ export class ClientsService {
     private async findClients(id: string): Promise<Clients> {
         let clients;
         try {
-            clients = await this.clientsRepository.findOne(
-                id, {
-                relations: ['visits', 'clientAttachment', 'clientsTemplates', 'clientsDeposits'],
-                loadRelationIds: true,
-            });
-            return clients;
+            clients = await this.clientsRepository
+                .createQueryBuilder('clients')
+                .leftJoin('clients.visits', 'visits') // Join visits table
+                .leftJoin('clients.clientAttachment', 'clientAttachment')
+                .leftJoin('clients.clientsTemplates', 'clientsTemplates')
+                .leftJoin('clients.clientsDeposits', 'clientsDeposits')
+                .select([
+                    'clients.id AS clients_id',
+                    'clients.name AS clients_name',
+                    'clients.nameForClientView AS clients_nameForClientView',
+                    'clients.number AS clients_number',
+                    'clients.healthStatus AS clients_healthStatus',
+                    'clients.deposit AS clients_deposit',
+                    'clients.balance AS clients_balance',
+                    'clients.birthDate AS clients_birthDate',
+                    'clients.extraInfo AS clients_extraInfo',
+                    'clients.orthodontia AS clients_orthodontia',
+                    'clients.orthopedia AS clients_orthopedia',
+                    'clients.implant AS clients_implant',
+                    'clients.diagnosis AS clients_diagnosis',
+                    'clients.future AS clients_future',
+                    'clients.notes AS clients_notes',
+                    'clients.complaint AS clients_complaint',
+                    'clients.isFinished AS clients_isFinished',
+                    'clients.isWaiting AS clients_isWaiting',
+                    'clients.isDeleted AS clients_isDeleted',
+                    'clients.createdAt AS clients_createdAt',
+                    'clients.updatedAt AS clients_updatedAt',
+                    'ARRAY_AGG(visits.id) AS visits_ids',
+                    'ARRAY_AGG(clientAttachment.id) AS clientAttachments_ids',
+                    'ARRAY_AGG(clientsDeposits.id) AS clientsDeposits_ids',
+                    'ARRAY_AGG(clientsTemplates.id) AS clientsTemplates_ids',
+                ])
+                .addSelect((qb) =>
+                    qb
+                        .subQuery()
+                        .select('ARRAY_AGG(visit.id)', 'notCalculatedVisits')
+                        .from('visits', 'visit')
+                        .leftJoin('visit.doctors', 'doctor') // Join the doctor relation
+                        .where('visit.clients = clients.id')
+                        .andWhere('visit.price IS NULL')
+                        .andWhere('doctor.name != :doctorName', { doctorName: 'Հին բազա' })
+                        .andWhere('visit.lastVisitChecked = :status', { status: VisitStatus.CAME }),
+                    'notCalculatedVisits',
+                )
+                .where('clients.id = :id', { id })
+                .groupBy('clients.id')
+                .getRawOne();
+
+            const transformedResult: any = {
+                id: clients.clients_id,
+                name: clients.clients_name,
+                nameForClientView: clients.clients_nameforclientview,
+                number: clients.clients_number,
+                healthStatus: clients.clients_healthstatus,
+                deposit: clients.clients_deposit,
+                balance: clients.clients_balance,
+                birthDate: clients.clients_birthdate,
+                extraInfo: clients.clients_extrainfo,
+                orthodontia: clients.clients_orthodontia,
+                orthopedia: clients.clients_orthopedia,
+                implant: clients.clients_implant,
+                diagnosis: clients.clients_diagnosis,
+                future: clients.clients_future,
+                notes: clients.clients_notes,
+                complaint: clients.clients_complaint,
+                isFinished: clients.clients_isfinished,
+                isWaiting: clients.clients_iswaiting,
+                isDeleted: clients.clients_isdeleted,
+                createdAt: clients.clients_createdat,
+                updatedAt: clients.clients_updatedat,
+                visits: clients.visits_ids.filter((el: any) => el !== null),
+                clientsDeposits: clients.clientsdeposits_ids.filter((el: any) => el !== null),
+                clientsTemplates: clients.clientstemplates_ids.filter((el: any) => el !== null).length === 0 ? null : clients.clientstemplates_ids.filter((el: any) => el !== null),
+                clientAttachment: clients.clientattachments_ids.filter((el: any) => el !== null),
+                notCalculatedVisits: clients.notCalculatedVisits ? clients.notCalculatedVisits.filter((el: any) => el !== null) : null,
+            };
+            return transformedResult;
         } catch (error) {
+            console.log(error)
             throw new NotFoundException('Could not find clients.');
         }
     }
