@@ -28,8 +28,8 @@ export const validateVisitsCreation = ({ values, permissions }: any) => {
             if ((child.realPriceForTreatment == null || child.realPriceForTreatment == '') && child.realPriceForTreatment !== 0) {
                 childErrors.realPriceForTreatment = 'ra.validation.required';
             }
-            if (child.realPriceForTreatment === 0) {
-                childErrors.realPriceForTreatment = 'Պետք է լինի մեծ 0-ից';
+            if (child.realPriceForTreatment == null) {
+                childErrors.realPriceForTreatment = 'ra.validation.required';
             }
             if ((child.payingPriceForTreatment == null || child.payingPriceForTreatment == '') && child.payingPriceForTreatment !== 0) {
                 childErrors.payingPriceForTreatment = 'ra.validation.required';

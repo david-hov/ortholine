@@ -9,7 +9,6 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'moment/locale/en-ie';
 import { Box, Button, FormControl, InputLabel, Menu, MenuItem, Select, useMediaQuery } from '@mui/material'
 import { isArray } from 'lodash'
-import RefreshIcon from '@mui/icons-material/RefreshRounded';
 
 moment.locale('en-ie', {
     week: {
@@ -33,6 +32,7 @@ export const CalendarView = () => {
     const [rangeDate, setRangeDate] = useState<any>(moment(moment().startOf('week').format()).format("YYYY-MM-DD HH:mm:ss"));
     const [rangeEndDate, setEndRangeDate] = useState<any>(moment(moment().endOf('week').format()).format("YYYY-MM-DD HH:mm:ss"));
     const inputRef = useRef<any>(null);
+    const [calendarLoading, setCalendarLoading] = useState(false);
 
     const handleClickDateInput = () => {
         if (inputRef.current === null) return;
@@ -73,6 +73,7 @@ export const CalendarView = () => {
 
     useEffect(() => {
         const getEvents = async () => {
+            setCalendarLoading(true);
             const { data } = await dataProvider.getList('visits/calendar', {
                 pagination: { page: 1, perPage: 10000 },
                 sort: { field: 'id', order: 'DESC' },
@@ -80,6 +81,7 @@ export const CalendarView = () => {
             })
             setEvents(data);
             setEventChanged(false);
+            setCalendarLoading(false);
         }
         getEvents();
         const interval = setInterval(() => {
@@ -186,7 +188,7 @@ export const CalendarView = () => {
         handleClose();
     }
 
-    if (isLoading) return <Loading />
+    if (isLoading || calendarLoading) return <Loading />
     return (
         <Box>
             <Menu

@@ -170,12 +170,32 @@ export class ClientsService {
             )
             .where(qb => {
                 qb.where('clients.isDeleted = :isDeleted', { isDeleted: false })
+                if (parsedFilter.hasOwnProperty('name') && parsedFilter.name.length >= 2) {
+                    qb.andWhere(`clients.name ILIKE :name`, { name: `%${parsedFilter.name.trim()}%` })
+                    qb.orWhere(`clientsTemplates.name ILIKE :clientInfoName`, { clientInfoName: `%${parsedFilter.name.trim()}%` })
+                    qb.orWhere(`clients.number ILIKE :number`, { number: `%${parsedFilter.name.trim()}%` })
+                        .andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
+                }
+                if (parsedFilter.hasOwnProperty('searchInFutureDiagnosis')) {
+                    qb.andWhere(`clients.future::jsonb @@ '$.text like_regex "${parsedFilter.searchInFutureDiagnosis.trim()}"'`)
+                    qb.orWhere(`clients.diagnosis::jsonb @@ '$.diagnose like_regex "${parsedFilter.searchInFutureDiagnosis.trim()}"'`)
+                        .andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
+                }
                 if (parsedFilter.hasOwnProperty('balanceNotOkay')) {
-                    if (parsedFilter['balanceNotOkay'] == true) {
-                        qb.andWhere('doctor.name != :doctorName', { doctorName: 'Հին բազա' })
-                        qb.andWhere('visits.price IS NULL')
-                        qb.andWhere('visits.lastVisitChecked = :status', { status: VisitStatus.CAME })
+                    if (parsedFilter['balanceNotOkay'] === true) {
+                        qb.andWhere('visits.price IS NULL');
+                    } else {
+                        qb.andWhere('visits.price IS NOT NULL')
+                          .groupBy('clients.id')
+                          .addGroupBy('visits.id')
+                          .addGroupBy('doctor.id')
+                          .addGroupBy('clientsTemplates.id')
+                          .addGroupBy('clientAttachment.id')
+                          .addGroupBy('clientsDeposits.id')
+                          .having('COUNT(CASE WHEN visits.price IS NULL OR visits.price < 0 THEN 1 END) = 0');  // Ensure no visits with invalid prices
                     }
+                    qb.andWhere('doctor.name != :doctorName', { doctorName: 'Հին բազա' });
+                    qb.andWhere('visits.lastVisitChecked = :status', { status: VisitStatus.CAME });
                 }
                 if (parsedFilter.hasOwnProperty('isFinished')) {
                     // changed
@@ -193,12 +213,6 @@ export class ClientsService {
                 }
                 if (parsedFilter.hasOwnProperty('birthDate')) {
                     qb.andWhere(`clients.birthDate = :birthDate`, { birthDate: parsedFilter['birthDate'] })
-                }
-                if (parsedFilter.hasOwnProperty('name') && parsedFilter.name.length >= 2) {
-                    qb.andWhere(`clients.name ILIKE :name`, { name: `%${parsedFilter.name.trim()}%` })
-                    qb.orWhere(`clientsTemplates.name ILIKE :clientInfoName`, { clientInfoName: `%${parsedFilter.name.trim()}%` })
-                    qb.orWhere(`clients.number ILIKE :number`, { number: `%${parsedFilter.name.trim()}%` })
-                        .andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
                 }
                 if (parsedFilter.hasOwnProperty('insurance')) {
                     qb.andWhere(`visits.insurance = :insurance`, { insurance: parsedFilter.insurance })
@@ -257,11 +271,6 @@ export class ClientsService {
                     } else {
                         qb.andWhere("clients.diagnosis = :diagnosis", { diagnosis: '[]' })
                     }
-                }
-                if (parsedFilter.hasOwnProperty('searchInFutureDiagnosis')) {
-                    qb.andWhere(`clients.future::jsonb @@ '$.text like_regex "${parsedFilter.searchInFutureDiagnosis.trim()}"'`)
-                    qb.orWhere(`clients.diagnosis::jsonb @@ '$.diagnose like_regex "${parsedFilter.searchInFutureDiagnosis.trim()}"'`)
-                        .andWhere('clients.isDeleted = :isDeleted', { isDeleted: false })
                 }
                 if (parsedFilter.hasOwnProperty('orthodontia') || parsedFilter.hasOwnProperty('orthopedia')
                     || parsedFilter.hasOwnProperty('implant')) {
@@ -533,7 +542,7 @@ export class ClientsService {
         try {
             clients = await this.clientsRepository
                 .createQueryBuilder('clients')
-                .leftJoin('clients.visits', 'visits') // Join visits table
+                .leftJoin('clients.visits', 'visits')
                 .leftJoin('clients.clientAttachment', 'clientAttachment')
                 .leftJoin('clients.clientsTemplates', 'clientsTemplates')
                 .leftJoin('clients.clientsDeposits', 'clientsDeposits')
