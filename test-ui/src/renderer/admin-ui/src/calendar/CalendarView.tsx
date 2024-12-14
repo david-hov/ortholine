@@ -32,7 +32,7 @@ export const CalendarView = () => {
     const [rangeDate, setRangeDate] = useState<any>(moment(moment().startOf('week').format()).format("YYYY-MM-DD HH:mm:ss"));
     const [rangeEndDate, setEndRangeDate] = useState<any>(moment(moment().endOf('week').format()).format("YYYY-MM-DD HH:mm:ss"));
     const inputRef = useRef<any>(null);
-    const [calendarLoading, setCalendarLoading] = useState(false);
+    // const [calendarLoading, setCalendarLoading] = useState(false);
 
     const handleClickDateInput = () => {
         if (inputRef.current === null) return;
@@ -56,6 +56,27 @@ export const CalendarView = () => {
     };
 
     useEffect(() => {
+        const getEvents = async () => {
+            // setCalendarLoading(true);
+            const { data } = await dataProvider.getList('visits/calendar', {
+                pagination: { page: 1, perPage: 10000 },
+                sort: { field: 'id', order: 'DESC' },
+                filter: { startDate: rangeDate, endDate: rangeEndDate, doctor: permissions === 'doctor' ? localStorage.getItem('token') : '' }
+            })
+            setEvents(data);
+            setEventChanged(false);
+            // setCalendarLoading(false);
+        }
+        getEvents();
+        const interval = setInterval(() => {
+            getEvents();
+        }, 5 * 60 * 1000);
+        return () => {
+            clearInterval(interval)
+        }
+    }, [rangeDate, calendarDate, contextMenu, eventChanged]);
+
+    useEffect(() => {
         const getDoctors = async () => {
             const { data } = await dataProvider.getList('doctors', {
                 pagination: { page: 1, perPage: 10000 },
@@ -70,27 +91,6 @@ export const CalendarView = () => {
         }
         getDoctors();
     }, []);
-
-    useEffect(() => {
-        const getEvents = async () => {
-            setCalendarLoading(true);
-            const { data } = await dataProvider.getList('visits/calendar', {
-                pagination: { page: 1, perPage: 10000 },
-                sort: { field: 'id', order: 'DESC' },
-                filter: { startDate: rangeDate, endDate: rangeEndDate, doctor: permissions === 'doctor' ? localStorage.getItem('token') : '' }
-            })
-            setEvents(data);
-            setEventChanged(false);
-            setCalendarLoading(false);
-        }
-        getEvents();
-        const interval = setInterval(() => {
-            getEvents();
-        }, 5 * 60 * 1000);
-        return () => {
-            clearInterval(interval)
-        }
-    }, [rangeDate, calendarDate, contextMenu, eventChanged]);
 
 
     const handleSelectSlot = ({ start, end }: any) => {
@@ -188,7 +188,7 @@ export const CalendarView = () => {
         handleClose();
     }
 
-    if (isLoading || calendarLoading) return <Loading />
+    if (isLoading) return <Loading />
     return (
         <Box>
             <Menu
@@ -260,93 +260,95 @@ export const CalendarView = () => {
                         }
                     </div>
                 </SimpleForm>
-                <DragAndDropCalendar
-                    components={{
-                        eventWrapper: ({ event, children, props }: any) => {
-                            if (event.info !== 'Չկա') {
-                                if (isArray(children.props.children.props.children)) {
-                                    children.props.children.props.children.push(<span className='info-notif'>*</span>)
+                {/* {calendarLoading ? <Loading/> : */}
+                    <DragAndDropCalendar
+                        components={{
+                            eventWrapper: ({ event, children, props }: any) => {
+                                if (event.info !== 'Չկա') {
+                                    if (isArray(children.props.children.props.children)) {
+                                        children.props.children.props.children.push(<span className='info-notif'>*</span>)
+                                    }
                                 }
-                            }
 
-                            return (
-                                <div
-                                    onContextMenu={
-                                        e => {
-                                            e.preventDefault()
-                                            if (e.type === 'contextmenu' && permissions != 'doctor') {
-                                                if (moment().isAfter(moment(event.start))) {
-                                                    handleClick(e, event)
+                                return (
+                                    <div
+                                        onContextMenu={
+                                            e => {
+                                                e.preventDefault()
+                                                if (e.type === 'contextmenu' && permissions != 'doctor') {
+                                                    if (moment().isAfter(moment(event.start))) {
+                                                        handleClick(e, event)
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                >
-                                    {children}
-                                </div>
-                            )
-                        }
-                    }}
-                    onRangeChange={(range: any) => {
-                        if (range.hasOwnProperty('start')) {
-                            setRangeDate(moment(new Date(range.start)).format("YYYY-MM-DD HH:mm:ss"))
-                            setEndRangeDate(moment(new Date(range.end)).format("YYYY-MM-DD HH:mm:ss"))
-                        } else if (range.length == 1) {
-                            setRangeDate(moment(new Date(range[0])).format("YYYY-MM-DD HH:mm:ss"))
-                            setEndRangeDate(moment(new Date(range[0]).setHours(23, 59)).format("YYYY-MM-DD HH:mm:ss"))
-                        } else {
-                            setRangeDate(moment(new Date(range[0])).format("YYYY-MM-DD HH:mm:ss"))
-                            setEndRangeDate(moment(new Date(range[range.length - 1])).format("YYYY-MM-DD HH:mm:ss"))
-                        }
-                    }}
-                    min={moment(new Date(0, 0, 0, 8, 0, 0)).toDate()}
-                    date={calendarDate}
-                    onNavigate={(date: any) => setCalendarDate(moment(date).format("YYYY-MM-DD HH:mm:ss"))}
-                    tooltipAccessor={(e: any) => {
-                        return '\n' + e.title + '\n' +
-                            'Բժիշկ - ' + e.doctor + '\n' +
-                            'Սենյակ - ' + e.room + '\n' +
-                            'Աղբյուր - ' + e.template + '\n' +
-                            'Նշում - ' + e.info + '\n' +
-                            'Ապպա -' + e.insurance
-                    }}
-                    eventPropGetter={(event: any) => {
-                        let newStyle = {
-                            backgroundColor: 'blue',
-                            borderRadius: "5px",
-                            border: "1px solid grey"
-                        };
-                        if (event.color) {
-                            newStyle.backgroundColor = event.color;
-                        }
-                        return {
-                            className: `${event.late == true ? 'late' : ''}` + ' ' + `${event.isFinished == false ? 'notFinished' : ''}`,
-                            style: newStyle
-                        }
-                    }}
-                    onEventResize={resizeEvent}
-                    onEventDrop={moveEvent}
-                    defaultDate={defaultDate}
-                    defaultView={isSmall ? Views.DAY : Views.WEEK}
-                    startAccessor={(event: any) => { return new Date(event.start) }}
-                    endAccessor={(event: any) => { return new Date(event.end) }}
-                    events={events}
-                    localizer={localizer}
-                    onSelectEvent={handleSelectEvent}
-                    onSelectSlot={(e) => handleSelectSlot(e)}
-                    messages={{
-                        next: "Հաջորդ",
-                        previous: "Նախորդ",
-                        today: "Այսօր",
-                        month: "Ամիս",
-                        week: "Շաբաթ",
-                        day: "Օր"
-                    }}
-                    selectable
-                    resizable
-                    popup
-                    scrollToTime={scrollToTime}
-                />
+                                    >
+                                        {children}
+                                    </div>
+                                )
+                            }
+                        }}
+                        onRangeChange={(range: any) => {
+                            if (range.hasOwnProperty('start')) {
+                                setRangeDate(moment(new Date(range.start)).format("YYYY-MM-DD HH:mm:ss"))
+                                setEndRangeDate(moment(new Date(range.end)).format("YYYY-MM-DD HH:mm:ss"))
+                            } else if (range.length == 1) {
+                                setRangeDate(moment(new Date(range[0])).format("YYYY-MM-DD HH:mm:ss"))
+                                setEndRangeDate(moment(new Date(range[0]).setHours(23, 59)).format("YYYY-MM-DD HH:mm:ss"))
+                            } else {
+                                setRangeDate(moment(new Date(range[0])).format("YYYY-MM-DD HH:mm:ss"))
+                                setEndRangeDate(moment(new Date(range[range.length - 1])).format("YYYY-MM-DD HH:mm:ss"))
+                            }
+                        }}
+                        min={moment(new Date(0, 0, 0, 8, 0, 0)).toDate()}
+                        date={calendarDate}
+                        onNavigate={(date: any) => setCalendarDate(moment(date).format("YYYY-MM-DD HH:mm:ss"))}
+                        tooltipAccessor={(e: any) => {
+                            return '\n' + e.title + '\n' +
+                                'Բժիշկ - ' + e.doctor + '\n' +
+                                'Սենյակ - ' + e.room + '\n' +
+                                'Աղբյուր - ' + e.template + '\n' +
+                                'Նշում - ' + e.info + '\n' +
+                                'Ապպա -' + e.insurance
+                        }}
+                        eventPropGetter={(event: any) => {
+                            let newStyle = {
+                                backgroundColor: 'blue',
+                                borderRadius: "5px",
+                                border: "1px solid grey"
+                            };
+                            if (event.color) {
+                                newStyle.backgroundColor = event.color;
+                            }
+                            return {
+                                className: `${event.late == true ? 'late' : ''}` + ' ' + `${event.isFinished == false ? 'notFinished' : ''}`,
+                                style: newStyle
+                            }
+                        }}
+                        onEventResize={resizeEvent}
+                        onEventDrop={moveEvent}
+                        defaultDate={defaultDate}
+                        defaultView={isSmall ? Views.DAY : Views.WEEK}
+                        startAccessor={(event: any) => { return new Date(event.start) }}
+                        endAccessor={(event: any) => { return new Date(event.end) }}
+                        events={events}
+                        localizer={localizer}
+                        onSelectEvent={handleSelectEvent}
+                        onSelectSlot={(e) => handleSelectSlot(e)}
+                        messages={{
+                            next: "Հաջորդ",
+                            previous: "Նախորդ",
+                            today: "Այսօր",
+                            month: "Ամիս",
+                            week: "Շաբաթ",
+                            day: "Օր"
+                        }}
+                        selectable
+                        resizable
+                        popup
+                        scrollToTime={scrollToTime}
+                    />
+                {/* } */}
             </div>
         </Box>
     )
