@@ -186,13 +186,13 @@ export class ClientsService {
                         qb.andWhere('visits.price IS NULL');
                     } else {
                         qb.andWhere('visits.price IS NOT NULL')
-                          .groupBy('clients.id')
-                          .addGroupBy('visits.id')
-                          .addGroupBy('doctor.id')
-                          .addGroupBy('clientsTemplates.id')
-                          .addGroupBy('clientAttachment.id')
-                          .addGroupBy('clientsDeposits.id')
-                          .having('COUNT(CASE WHEN visits.price IS NULL OR visits.price < 0 THEN 1 END) = 0');  // Ensure no visits with invalid prices
+                            .groupBy('clients.id')
+                            .addGroupBy('visits.id')
+                            .addGroupBy('doctor.id')
+                            .addGroupBy('clientsTemplates.id')
+                            .addGroupBy('clientAttachment.id')
+                            .addGroupBy('clientsDeposits.id')
+                            .having('COUNT(CASE WHEN visits.price IS NULL OR visits.price < 0 THEN 1 END) = 0');  // Ensure no visits with invalid prices
                     }
                     qb.andWhere('doctor.name != :doctorName', { doctorName: 'Հին բազա' });
                     qb.andWhere('visits.lastVisitChecked = :status', { status: VisitStatus.CAME });
@@ -568,15 +568,15 @@ export class ClientsService {
                     'clients.isDeleted AS clients_isDeleted',
                     'clients.createdAt AS clients_createdAt',
                     'clients.updatedAt AS clients_updatedAt',
-                    'ARRAY_AGG(visits.id) AS visits_ids',
-                    'ARRAY_AGG(clientAttachment.id) AS clientAttachments_ids',
-                    'ARRAY_AGG(clientsDeposits.id) AS clientsDeposits_ids',
-                    'ARRAY_AGG(clientsTemplates.id) AS clientsTemplates_ids',
+                    'clients.clientsTemplates AS clients_clientsTemplates',
+                    'ARRAY_AGG(DISTINCT visits.id) AS visits_ids',
+                    'ARRAY_AGG(DISTINCT clientAttachment.id) AS clientAttachments_ids', // Remove duplicates
+                    'ARRAY_AGG(DISTINCT clientsDeposits.id) AS clientsDeposits_ids', // Remove duplicates
                 ])
                 .addSelect((qb) =>
                     qb
                         .subQuery()
-                        .select('ARRAY_AGG(visit.id)', 'notCalculatedVisits')
+                        .select('ARRAY_AGG(DISTINCT visit.id)', 'notCalculatedVisits')  // Remove duplicates in subquery
                         .from('visits', 'visit')
                         .leftJoin('visit.doctors', 'doctor') // Join the doctor relation
                         .where('visit.clients = clients.id')
@@ -613,7 +613,7 @@ export class ClientsService {
                 updatedAt: clients.clients_updatedat,
                 visits: clients.visits_ids.filter((el: any) => el !== null),
                 clientsDeposits: clients.clientsdeposits_ids.filter((el: any) => el !== null),
-                clientsTemplates: clients.clientstemplates_ids.filter((el: any) => el !== null).length === 0 ? null : clients.clientstemplates_ids.filter((el: any) => el !== null),
+                clientsTemplates: clients.clients_clientsTemplates,
                 clientAttachment: clients.clientattachments_ids.filter((el: any) => el !== null),
                 notCalculatedVisits: clients.notCalculatedVisits ? clients.notCalculatedVisits.filter((el: any) => el !== null) : null,
             };
